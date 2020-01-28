@@ -30,8 +30,8 @@ public class DeckUtil {
 
     private final static Logger logger = LogManager.getLogger(DeckUtil.class);
 
-    private final static int threadCount = 3;
-    private final static ExecutorService searchThreads = Executors.newFixedThreadPool(threadCount, new CustomThreadFactory("Search-thread"));
+    private final static int THREAD_COUNT = 3;
+    private final static ExecutorService searchThreads = Executors.newFixedThreadPool(THREAD_COUNT, new CustomThreadFactory("Search-thread"));
 
     private static CountDownLatch latch;
     private static String searchWord;
@@ -88,20 +88,20 @@ public class DeckUtil {
 
         if(searchWord.length() == 0) {return Collections.emptyList();}
 
-        latch = new CountDownLatch(threadCount);
+        latch = new CountDownLatch(THREAD_COUNT);
 
         //Gather information to distribute the search over all of the search threads.
         List list = deck.getImmutableList();
         int listSize = list.size();
-        int listSizeDivided = listSize / threadCount;
-        int excess = listSize % threadCount;
+        int listSizeDivided = listSize / THREAD_COUNT;
+        int excess = listSize % THREAD_COUNT;
         int fromIndex = 0;
         int toIndex = listSizeDivided - 1;
         boolean excessLeft = false;
 
         //Even out the load for each thread and then submit to the executor service.
         if(excess > 0){excessLeft = true;}
-        for(int i = 1; i < threadCount + 1; i++) {
+        for(int i = 1; i < THREAD_COUNT + 1; i++) {
 
             if(excessLeft) {
 

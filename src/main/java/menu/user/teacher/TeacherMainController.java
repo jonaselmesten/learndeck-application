@@ -25,7 +25,7 @@ import menu.WindowUtil;
 import menu.user.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import server.ServerUtil;
+import server.ServerConnection;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -53,33 +53,20 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         updateGridPane();
     }
 
+    //TO DO: See over the update/deletion-flow.
     private void windowClosing() {
 
         logger.debug("Closing TeacherMainController-window.");
 
-        try{
-            removeEmptyCourses();
+        try {
+            DeckUtil.createDefaultDirectory();
+            DeckUtil.saveCoursesToPC(courseMap.values());
+            removeAndUploadCourses();
 
-            //Save all non-empty courses
-            DeckUtil.courseToFile(courseMap.values());
+        }catch(IOException e) {
 
-        }catch(IOException e) { //When files could not be removed/saved.
-
-            logger.debug("IOException occurred while trying to remove/save a course.", e);
-            e.printStackTrace();
-
-        }finally { //Always try to save courses to PC
-
-            try {
-                DeckUtil.createDefaultDirectory();
-                DeckUtil.courseToFile(courseMap.values());
-
-            }catch(IOException e) {
-
-                WindowUtil.createPopUpWarning(getWindow(), "File error - Contact admin");
-                logger.debug("IOException occurred while trying to create default directory and save courses to it.", e);
-                e.printStackTrace();
-            }
+            WindowUtil.createPopUpWarning(getWindow(), "File error - Contact admin");
+            logger.error("IOException occurred while trying to create default directory and save courses to it.", e);
         }
     }
 
@@ -151,7 +138,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
 
         try {
             DatabaseUtil.removeCourse(deck.getCourseId());
-            ServerUtil.removeCourseFile(deck);
+            //ServerConnection.removeCourseFile(deck);
             DeckUtil.removeCourseFile(deck);
 
             courseMap.remove(deck.getCourseName());
@@ -165,6 +152,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
             e.printStackTrace();
         }
     }
+
     private void statsButtonPushed(MenuButton menuButton) {
 
         Deck deck = getDeckFromGrid(menuButton);
@@ -184,11 +172,11 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         for(QueryResult.TeacherCourse course : list) {
 
             if(!DeckUtil.courseFileExists(course.getCourseName())) {
-                ServerUtil.downloadDeck(course.getCourseName());
+                //ServerConnection.downloadDeck(course.getCourseName());
             }
         }
 
-        ServerUtil.waitForAllDownloads();
+        //ServerConnection.waitForAllDownloads();
     }
 
     private List<Integer> getCourseInfo(List<QueryResult.TeacherCourse> list) throws IOException, InterruptedException, ExecutionException {
@@ -201,7 +189,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
             String courseName = courseInfo.getCourseName();
             int courseId = courseInfo.getCourseId();
 
-            courseMap.put(courseName, DeckUtil.fileToDeck(courseName));
+            courseMap.put(courseName, DeckUtil.fileToCourse(courseName));
 
             taskList.add(() -> DatabaseUtil.getCardAmount(courseId));
 
@@ -286,35 +274,50 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         courseGridPosition++;
     }
 
-    private void removeEmptyCourses() {
+    //TO DO: Make batch removal from the database(?)
+    //TO DO: Don't open a server connection if course never have been uploaded.
+    //To DO: Handle exceptions better.
+    private void removeAndUploadCourses() {
 
         try{
+            ServerConnection serverConnection = new ServerConnection(user);
+
             //Remove all empty courses from Directory, Database & Server.
             for(Deck deck : courseMap.values()) {
 
+                IOStatus status = deck.getIoStatus();
+
                 if(deck.getDeckSize() == 0) {
+
+                    courseMap.remove(deck.getCourseName());
 
                     DatabaseUtil.removeCourse(deck.getCourseId());
 
-                    //Deck is updated to 0 cards and is not a newly created deck - has to be remove from PC & Server.
-                    if(deck.getIoStatus().equals(IOStatus.CHANGED)) {
+                    //Deck is updated to 0 cards and is not a newly created deck - has to be removed from PC & Server.
+                    if(status.equals(IOStatus.CHANGED)) {
 
                         DeckUtil.removeCourseFile(deck);
-                        ServerUtil.removeCourseFile(deck);
+                        serverConnection.addCourseToBeRemoved(deck.getCourseName());
                     }
-
-                }else {ServerUtil.uploadDeck(deck);}
+                }
+                //Upload if it has 1+ card and is new/changed.
+                if(status.equals(IOStatus.NEW) || status.equals(IOStatus.CHANGED))
+                    serverConnection.addCourseToUpload(deck);
             }
+
+            serverConnection.uploadCourses();
+            serverConnection.removeFiles();
+
         }catch(SQLException e) {
 
             WindowUtil.createPopUpWarning(getWindow(), "Database error - You will be able to remove empty courses next log in.");
             logger.debug("SQLException occurred while trying to remove a course from database.", e);
             e.printStackTrace();
 
-        }catch(IOException e) { //REM COURSE FILE
+        }catch(IOException e) {
 
-            WindowUtil.createPopUpWarning(getWindow(), "Could not remove file from PC.");
-            logger.debug("IOException occurred while trying to remove a course from PC.", e);
+            WindowUtil.createPopUpWarning(getWindow(), "Could not remove file from PC/server.");
+            logger.debug("IOException occurred while trying to remove a course from PC/server.", e);
             e.printStackTrace();
         }
     }

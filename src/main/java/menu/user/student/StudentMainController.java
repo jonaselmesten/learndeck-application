@@ -7,13 +7,10 @@ import deck.DeckUtil;
 import deck.card.Card;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -171,7 +168,7 @@ public class StudentMainController implements ChangeableWindow, UserController {
                 int newCardAmount = info.getNewCards();
 
                 addRowOnGrid(courseName, cardAmount, dueCardAmount, newCardAmount);
-                courseMap.put(courseName, DeckUtil.fileToDeck(courseName));
+                courseMap.put(courseName, DeckUtil.fileToCourse(courseName));
             }
 
         }catch(SQLException | IOException e) {

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -184,7 +185,7 @@ public class DeckUtil {
      * @return Deck created from the file.
      * @throws IOException When trying to read file.
      */
-    public static Deck fileToDeck(String courseName) throws IOException {
+    public static Deck fileToCourse(String courseName) throws IOException {
 
         logger.debug("Method call:fileToDeck CourseName:" + courseName);
 
@@ -199,15 +200,23 @@ public class DeckUtil {
     }
 
 
+
+    public static Path getCoursePath(String courseName) {
+
+        logger.info("Method call:getCourseFile");
+
+        return Paths.get(deckPath + "\\" + courseName + ".txt");
+    }
+
     /**
      * Saves decks as files on the PC, serializing it. Decks with the IOStatus "unchanged" will not be saved.
      * @param decks Decks to be saved.
      * @return Number of decks that was saved.
      * @throws IOException When trying to write.
      */
-    public static int courseToFile(Collection<Deck> decks) throws IOException {
+    public static int saveCoursesToPC(Collection<Deck> decks) throws IOException {
 
-        logger.info("Method call:coursesToFiles");
+        logger.info("Method call:saveCoursesToPC");
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();

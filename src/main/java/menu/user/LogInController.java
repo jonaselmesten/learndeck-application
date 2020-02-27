@@ -4,21 +4,17 @@ import database.DatabaseUtil;
 import deck.DeckUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.stage.Window;
-import menu.*;
+import menu.ChangeableWindow;
+import menu.UserController;
+import menu.WindowUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import server.ServerUtil;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 public class LogInController implements ChangeableWindow, UserController {
 

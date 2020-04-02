@@ -1,8 +1,9 @@
-package deck;
+package deck.serializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import deck.Deck;
 import deck.card.Card;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

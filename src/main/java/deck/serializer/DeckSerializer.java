@@ -1,8 +1,9 @@
-package deck;
+package deck.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import deck.Deck;
 import deck.card.Card;
 import deck.card.CardComponent;
 import deck.card.component.ImageViewComponent;

@@ -40,6 +40,24 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <version>0.9.5.4</version>
@@ -49,6 +67,12 @@
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
             <version>1.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.13</version>
         </dependency>
 
         <dependency>

@@ -128,6 +128,7 @@ public class WindowUtil {
     }
 
 
+    //TO DO: Send e-mail to user.
     /**
      * User when a new user is created, and you want to display their log in information.
      * @param userName User name to be displayed.

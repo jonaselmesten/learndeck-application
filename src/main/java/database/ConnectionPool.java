@@ -1,6 +1,6 @@
 package database;
 
-import com.mchange.v2.c3p0.*;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -23,12 +23,13 @@ public class ConnectionPool {
 
     private final static Logger logger = LogManager.getLogger(ConnectionPool.class);
     private final static ComboPooledDataSource pool = new ComboPooledDataSource();
+    private final static Path configFile = Path.of(System.getProperty("user.dir") + "\\src\\main\\resources\\conifg\\db.properties");
 
     private ConnectionPool() {};
 
-    public static void initialize(URL propertyFile) {
+    public static void initialize() {
 
-        try(FileInputStream fis = new FileInputStream(propertyFile.getPath())) {
+        try(FileInputStream fis = new FileInputStream(String.valueOf(configFile))) {
 
             Properties properties = new Properties();
             properties.load(fis);

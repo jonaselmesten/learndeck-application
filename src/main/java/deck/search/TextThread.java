@@ -7,13 +7,14 @@ import deck.card.component.TextAreaComponent;
 
 import java.util.List;
 
-//Used for text searches.
 class TextThread implements Runnable {
 
+    private final String SEARCH_WORD;
     private final List<Card> searchResultList;
     private final List<Card> subList;
 
-    TextThread(List<Card> subList, List<Card> searchResultList) {
+    TextThread(List<Card> subList, List<Card> searchResultList, String searchWord) {
+        SEARCH_WORD = searchWord;
         this.searchResultList = searchResultList;
         this.subList = subList;
     }
@@ -29,7 +30,7 @@ class TextThread implements Runnable {
                 if(CardComponents.TEXT_AREA == component.getComponentEnum()) {
 
                     TextAreaComponent text = (TextAreaComponent) component;
-                    int index = text.getRawObject().toLowerCase().indexOf(searchWord.toString().toLowerCase());
+                    int index = text.getRawObject().toLowerCase().indexOf(SEARCH_WORD.toString().toLowerCase());
 
                     if(index != -1) {
                         searchResultList.add(card);
@@ -38,6 +39,5 @@ class TextThread implements Runnable {
                 }
             }
         }
-        latch.countDown();
     }
 }

@@ -5,7 +5,9 @@ import database.QueryResult;
 import deck.Deck;
 import deck.DeckUtil;
 import deck.IOStatus;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,21 +19,28 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import menu.ChangeableWindow;
 import menu.ControlStage;
 import menu.UserController;
 import menu.WindowUtil;
 import menu.user.User;
+import menu.window.ProgressWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.ServerConnection;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 
+//TO DO: Check the default directory at start up and then again when doing file-related actions.
+//TO DO: See over all exceptions for the file- DB- and FTP-related methods.
+//TO DO: GUI needs to sort the courses in alphabetic order when something is removed.
+//TO DO: Add progress indicator to update/remove when closing window/log out.
 public class TeacherMainController implements UserController, ChangeableWindow {
 
     @FXML private GridPane courseGrid;
@@ -59,7 +68,6 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         logger.debug("Closing TeacherMainController-window.");
 
         try {
-            DeckUtil.createDefaultDirectory();
             DeckUtil.saveCoursesToPC(courseMap.values());
             removeAndUploadCourses();
 
@@ -95,7 +103,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
 
     private void addEditCardsButtonPushed(MenuButton menuButton, Text cardCount) {
 
-        Deck deck = getDeckFromGrid(menuButton);
+        Deck deck = getCourseFromGrid(menuButton);
 
         ControlStage ct = WindowUtil.addWindowOnTop(getClass().getResource("/fxml/editCardsWindow.fxml")); //FUNK? FINARE
         Stage stage = ct.getStage();
@@ -132,30 +140,36 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         stage.showAndWait();
     }
 
-    private void removeDeckButtonPushed(MenuButton menuButton) {
+    //TO DO: See over exception.
+    private void removeCourseButtonPushed(MenuButton menuButton) {
 
-        Deck deck = getDeckFromGrid(menuButton);
+        Deck course = getCourseFromGrid(menuButton);
 
         try {
-            DatabaseUtil.removeCourse(deck.getCourseId());
-            //ServerConnection.removeCourseFile(deck);
-            DeckUtil.removeCourseFile(deck);
+            ServerConnection serverConnection;
+            DatabaseUtil.removeCourse(course.getCourseId());
+            DeckUtil.removeCourseFile(course);
 
-            courseMap.remove(deck.getCourseName());
+            //Only decks that's not are uploaded to the server.
+            if(!course.getIoStatus().equals(IOStatus.NEW)) {
+
+                serverConnection = new ServerConnection(user);
+                serverConnection.removeCourseFile(course);
+            }
+
+            courseMap.remove(course.getCourseName());
             removeCourseFromGrid(menuButton);
 
         }catch(SQLException e) {
-            logger.debug("SQLException occurred while trying to remove course:" + deck.getCourseName() + " Id:" + deck.getCourseId() + " from database.", e);
-            e.printStackTrace();
+            logger.error("SQLException occurred while trying to remove course:" + course.getCourseName() + " Id:" + course.getCourseId() + " from database.", e);
         }catch(IOException e) {
-            logger.debug("IOException occurred while trying to remove course:" + deck.getCourseName() + " Id:" + deck.getCourseId() + " from PC.", e);
-            e.printStackTrace();
+            logger.error("IOException occurred while trying to remove course:" + course.getCourseName() + " Id:" + course.getCourseId() + " from PC.", e);
         }
     }
 
     private void statsButtonPushed(MenuButton menuButton) {
 
-        Deck deck = getDeckFromGrid(menuButton);
+        Deck deck = getCourseFromGrid(menuButton);
 
         ControlStage ct = WindowUtil.addWindowOnTop(getClass().getResource("/fxml/statWindow.fxml"));
         Stage stage = ct.getStage();
@@ -263,7 +277,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         //Set methods for all the buttons.
         editCardsOption.setOnAction(event -> addEditCardsButtonPushed(menuButton, cardCountText));
         statsOption.setOnAction(event -> statsButtonPushed(menuButton));
-        removeDeckOption.setOnAction(event -> removeDeckButtonPushed(menuButton));
+        removeDeckOption.setOnAction(event -> removeCourseButtonPushed(menuButton));
         addRemoveStudentOption.setOnAction(event -> addRemoveStudentButtonPushed(menuButton, studentCountText));
 
         //Add everything to the GUI/course-grid.
@@ -274,52 +288,90 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         courseGridPosition++;
     }
 
-    //TO DO: Make batch removal from the database(?)
-    //TO DO: Don't open a server connection if course never have been uploaded.
-    //To DO: Handle exceptions better.
+
+    private ControlStage showProgressWindow() {
+
+        ControlStage controlStage = WindowUtil.addWindowOnTop(getClass().getResource("/fxml/progressWindow.fxml"));
+
+        Stage stage = controlStage.getStage();
+
+        stage.initStyle(StageStyle.DECORATED);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        stage.setAlwaysOnTop(true);
+        stage.show();
+
+        return controlStage;
+    }
+
+    //TO DO: Handle exceptions better/other place.
+    //TO DO: Try to make more slim.
     private void removeAndUploadCourses() {
 
-        try{
-            ServerConnection serverConnection = new ServerConnection(user);
+        ControlStage controlStage = showProgressWindow();
+        ProgressWindow progressWindow = (ProgressWindow) controlStage.getController();
 
-            //Remove all empty courses from Directory, Database & Server.
-            for(Deck deck : courseMap.values()) {
+        Task<Void> task = new Task<>() {
 
-                IOStatus status = deck.getIoStatus();
+            @Override
+            protected Void call() {
 
-                if(deck.getDeckSize() == 0) {
+                int totalWork = courseMap.values().size();
+                int workCount = 0;
 
-                    courseMap.remove(deck.getCourseName());
+                try{
+                    ServerConnection serverConnection = new ServerConnection(user);
 
-                    DatabaseUtil.removeCourse(deck.getCourseId());
+                    //Remove all empty courses from Directory, Database & Server.
+                    for(Deck deck : courseMap.values()) {
 
-                    //Deck is updated to 0 cards and is not a newly created deck - has to be removed from PC & Server.
-                    if(status.equals(IOStatus.CHANGED)) {
+                        IOStatus status = deck.getIoStatus();
 
-                        DeckUtil.removeCourseFile(deck);
-                        serverConnection.addCourseToBeRemoved(deck.getCourseName());
+                        //Remove courses
+                        if(deck.getDeckSize() == 0) {
+
+                            DatabaseUtil.removeCourse(deck.getCourseId());
+
+                            //Deck is updated to 0 cards and is not a newly created deck - has to be removed from PC & Server.
+                            if(status.equals(IOStatus.CHANGED)) {
+
+                                DeckUtil.removeCourseFile(deck);
+                                serverConnection.removeCourseFile(deck);
+                            }
+                            courseMap.remove(deck.getCourseName());
+                        }
+
+                        //Upload if it has 1+ card and is new/changed.
+                        if(status.equals(IOStatus.NEW) || status.equals(IOStatus.CHANGED)) {
+
+                            serverConnection.uploadCourseFile(deck);
+                            DatabaseUtil.updateCourseModificationDate(deck);
+                        }
+                        updateProgress(++workCount, totalWork);
                     }
+
+                }catch(SQLException e) {
+
+                    WindowUtil.createPopUpWarning(getWindow(), "Database error - You will be able to remove empty courses next log in.");
+                    logger.error("SQLException occurred while trying to remove a course from database.", e);
+
+                }catch(IOException e) {
+
+                    WindowUtil.createPopUpWarning(getWindow(), "Could not remove file from PC/server.");
+                    logger.error("IOException occurred while trying to remove a course from PC/server.", e);
                 }
-                //Upload if it has 1+ card and is new/changed.
-                if(status.equals(IOStatus.NEW) || status.equals(IOStatus.CHANGED))
-                    serverConnection.addCourseToUpload(deck);
+
+                Platform.runLater(controlStage.getStage()::close);
+                return null;
             }
+        };
 
-            serverConnection.uploadCourses();
-            serverConnection.removeFiles();
+        progressWindow.getProgressBar().progressProperty().bind(task.progressProperty());
 
-        }catch(SQLException e) {
+        Thread thread = new Thread(task, "TeacherMainController - Closing task");
+        thread.setDaemon(true);
 
-            WindowUtil.createPopUpWarning(getWindow(), "Database error - You will be able to remove empty courses next log in.");
-            logger.debug("SQLException occurred while trying to remove a course from database.", e);
-            e.printStackTrace();
-
-        }catch(IOException e) {
-
-            WindowUtil.createPopUpWarning(getWindow(), "Could not remove file from PC/server.");
-            logger.debug("IOException occurred while trying to remove a course from PC/server.", e);
-            e.printStackTrace();
-        }
+        thread.start();
     }
 
     private void removeCourseFromGrid(Node buttonPushed) {
@@ -347,7 +399,7 @@ public class TeacherMainController implements UserController, ChangeableWindow {
         return Integer.parseInt(stuCount.getText());
     }
 
-    private Deck getDeckFromGrid(Node gridNode) {
+    private Deck getCourseFromGrid(Node gridNode) {
 
         ObservableList<Node> children = courseGrid.getChildren();
         int column = GridPane.getColumnIndex(gridNode) - 3;

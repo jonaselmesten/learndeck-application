@@ -35,13 +35,13 @@
                         <Font size="20.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="userName" maxWidth="175.0" minHeight="25.0" prefWidth="200.0" promptText="Enter user name" style="-fx-border-style: solid;" />
+                  <TextField fx:id="userName" maxWidth="175.0" minHeight="25.0" prefWidth="200.0" promptText="Enter user name" style="-fx-border-style: solid;" text="joel92" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password" wrappingWidth="175.0">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Text>
-                  <PasswordField fx:id="password" maxWidth="175.0" minHeight="25.0" prefWidth="200.0" promptText="Enter password" style="-fx-border-style: solid;" />
+                  <PasswordField fx:id="password" maxWidth="175.0" minHeight="25.0" prefWidth="200.0" promptText="Enter password" style="-fx-border-style: solid;" text="abc123!" />
                   <Button depthTest="DISABLE" maxWidth="175.0" minHeight="50.0" minWidth="150.0" mnemonicParsing="false" onAction="#logInButtonPushed" style="-fx-background-color: white; -fx-border-style: solid;" text="Log in">
                      <VBox.margin>
                         <Insets top="10.0" />

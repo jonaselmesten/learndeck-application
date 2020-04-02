@@ -1,5 +1,7 @@
 package database;
 
+import deck.Deck;
+import deck.DeckUtil;
 import deck.card.Card;
 import javafx.scene.control.TextField;
 import menu.user.User;
@@ -7,8 +9,13 @@ import menu.user.UserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -423,6 +430,8 @@ public class DatabaseUtil {
                         "SELECT " +
                                 "course_name AS COURSE, " +
 
+                                "made_by_teacher AS TEACHER, " +
+
                                 "COUNT(card_id) AS CARDS, " +
 
                                 "(SELECT COUNT(DISTINCT card_id) FROM card_review CR " +
@@ -431,7 +440,9 @@ public class DatabaseUtil {
 
                                 "(SELECT COUNT(DISTINCT card_id) FROM card_review CR " +
                                 "   WHERE next_review_date = '1111-11-11' AND CR.course_id = CO.course_id AND CR.student_id = SHC.student_id) " +
-                                "AS NEW_CARDS " +
+                                "AS NEW_CARDS, " +
+
+                                "CO.modification_date AS MOD_DATE " +
 
                                 "FROM course CO " +
                                 "   INNER JOIN card C " +
@@ -447,7 +458,13 @@ public class DatabaseUtil {
             try(ResultSet rs = statement.executeQuery()) {
 
                 while(rs.next()) {
-                    list.add(new QueryResult.StudentCourseInfo(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4)));
+                    list.add(new QueryResult.StudentCourseInfo(
+                            rs.getString(1),
+                            rs.getInt(2),
+                            rs.getInt(3),
+                            rs.getInt(4),
+                            rs.getInt(5),
+                            rs.getTimestamp(6)));
                 }
             }
             return list;
@@ -533,6 +550,31 @@ public class DatabaseUtil {
         ) {
             statement.setInt(1,courseId);
             statement.setDouble(2,difficulty);
+
+            statement.executeUpdate();
+        }
+    }
+
+
+    /**Update a courses' modification date. The date and time will be the instant this method is called.
+     * @param deck Deck to update.
+     * @throws SQLException On connection error.
+     */
+    public static void updateCourseModificationDate(Deck deck) throws SQLException {
+
+        System.out.println("UPPDATEINT TIME DB" );
+
+        try(
+                Connection connection = ConnectionPool.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "UPDATE course " +
+                                "SET modification_date = ? " +
+                                "WHERE course_id = ? "
+
+        )) {
+
+            statement.setTimestamp(1, Timestamp.from(Instant.now()));
+            statement.setInt(2, deck.getCourseId());
 
             statement.executeUpdate();
         }

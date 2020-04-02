@@ -19,12 +19,14 @@ import menu.ControlStage;
 import menu.UserController;
 import menu.WindowUtil;
 import menu.user.User;
+import menu.user.UserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import server.ServerConnection;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.*;
 
 public class StudentMainController implements ChangeableWindow, UserController {
@@ -46,58 +48,69 @@ public class StudentMainController implements ChangeableWindow, UserController {
         getWindow().setOnCloseRequest(event -> onWindowClose());
     }
 
+    //Try to load reviews from PC, if files does not exist/failed to load - load from DB.
     private void loadReviews() {
 
-        //Always try to get reviews from the PC first.
-        List<LocalDate> storedReviews = getStoredReviews();
+        if(DeckUtil.hasStoredReviews(user)) {
 
-        if(storedReviews.isEmpty()) {
+            try {
+                DeckUtil.readReviewsFromFile(user, courseMap);
+            }catch(IOException e) {
 
-            //No reviews stored on PC, so we need to get them from the database.
-            for(Deck deck : courseMap.values()) {
+                loadReviewsFromDB();
+                e.printStackTrace();
+            }
+        }else
+            loadReviewsFromDB();
+    }
 
-                try {
-                    List<QueryResult.CardReview> list = DatabaseUtil.getReviews(user.getUserId(), deck.getCourseId());
+    private void loadReviewsFromDB() {
 
-                    System.out.println(list.size());
-                    System.out.println(deck.getDeckSize());
+        for(Deck deck : courseMap.values()) {
 
-                    deck.sortCardsAfterId();
-                    ListIterator<Card> iterator = deck.getCardIterator();
+            try {
+                List<QueryResult.CardReview> list = DatabaseUtil.getReviews(user.getUserId(), deck.getCourseId());
 
-                    if(list.size() != deck.getDeckSize())
-                        throw new IndexOutOfBoundsException();
+                deck.sortCardsAfterId();
+                ListIterator<Card> iterator = deck.getCardIterator();
 
-                    //Goes through all the cards and sets the review dates.
-                    for(QueryResult.CardReview review : list) {
+                if(list.size() != deck.getDeckSize())
+                    throw new IndexOutOfBoundsException();
 
-                        Card card = iterator.next();
-                        card.setNextReview(review.getNextReview());
+                //Goes through all the cards and sets the review dates.
+                for(QueryResult.CardReview review : list) {
 
-                        if(!card.isFirstReview())
-                            card.setReviewStats(review.getReviewStats());
-                    }
+                    Card card = iterator.next();
+                    card.setNextReview(review.getNextReview());
 
-                    deck.sortCardsAfterReviewDate();
-
-                }catch(SQLException e) {
-
-                    logger.debug("SQLException while trying to get review data from deck:" + deck.getCourseName() + " Id:" + deck.getCourseId(), e);
-                    e.printStackTrace();
+                    if(!card.isFirstReview())
+                        card.setReviewStats(review.getReviewStats());
                 }
+
+                deck.sortCardsAfterReviewDate();
+
+            }catch(SQLException e) {
+
+                logger.debug("SQLException while trying to get review data from deck:" + deck.getCourseName() + " Id:" + deck.getCourseId(), e);
+                e.printStackTrace();
             }
         }
     }
 
-    private List<LocalDate> getStoredReviews() {
-        return Collections.emptyList(); //This will be added in another update of the program.
-    }
 
     public void logOutButtonPushed() {
+        onWindowClose();
         WindowUtil.changeWindow(getClass().getResource("/fxml/logInWindow.fxml"), getWindow());
     }
 
-    private void onWindowClose() {}
+    private void onWindowClose() {
+
+        try {
+            DeckUtil.saveReviewsAsFile(user, courseMap.values());
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     //Adds everything GUI-related to the gridPane.
     private void addRowOnGrid(String courseName, int cardAmount, int dueCardAmount, int newCardAmount) {
@@ -155,10 +168,12 @@ public class StudentMainController implements ChangeableWindow, UserController {
         return deck;
     }
 
+    //TO DO:Handle exceptions.
     private void updateGridPane() {
 
         try {
             List<QueryResult.StudentCourseInfo> list = DatabaseUtil.getStudentCourseInfo(user.getUserId());
+            List<QueryResult.StudentCourseInfo> downloadList = new ArrayList<>();
 
             for(QueryResult.StudentCourseInfo info : list) {
 
@@ -167,12 +182,52 @@ public class StudentMainController implements ChangeableWindow, UserController {
                 int dueCardAmount = info.getDueCards();
                 int newCardAmount = info.getNewCards();
 
-                addRowOnGrid(courseName, cardAmount, dueCardAmount, newCardAmount);
-                courseMap.put(courseName, DeckUtil.fileToCourse(courseName));
+                //Load all courses from the PC or download them.
+                if(DeckUtil.courseFileExists(courseName)) {
+
+                    Instant fileInstant = DeckUtil.getLastModificationDate(courseName);
+                    Instant dbInstant = info.getModificationDate();
+
+                    //Download updated courses.
+                    if(fileInstant.isBefore(dbInstant)) {
+                        downloadList.add(info);
+                        continue;
+                    }
+
+                    courseMap.put(courseName, DeckUtil.fileToCourse(courseName));
+                    addRowOnGrid(courseName, cardAmount, dueCardAmount, newCardAmount);
+                }else {
+                    downloadList.add(info);
+                }
             }
+            //Download missing courses.
+            if(!list.isEmpty())
+                downloadCourses(downloadList);
 
         }catch(SQLException | IOException e) {
             logger.debug("SQLException while trying to get student course data in updateGridPane-method:", e);
+            e.printStackTrace();
+        }
+    }
+
+    //TO DO:Handle exception.
+    //Download missing courses and add them to the GUI.
+    private void downloadCourses(List<QueryResult.StudentCourseInfo> list) {
+
+        try(ServerConnection connection = new ServerConnection(user)) {
+
+            for(QueryResult.StudentCourseInfo info : list) {
+
+                String courseName = info.getCourseName();
+                String teacherDirectory = "TEACHER_" + info.getTeacherId();
+
+                connection.downloadCourseFile(info.getCourseName(), UserType.TEACHER, teacherDirectory);
+                courseMap.put(courseName, DeckUtil.fileToCourse(courseName));
+
+                addRowOnGrid(courseName, info.getTotalCards(), info.getDueCards(), info.getNewCards());
+            }
+
+        }catch(IOException e) {
             e.printStackTrace();
         }
     }

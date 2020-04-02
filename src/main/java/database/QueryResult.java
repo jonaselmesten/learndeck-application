@@ -1,6 +1,10 @@
 package database;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 
 /**<h1>Query result</h1>
@@ -25,8 +29,8 @@ public class QueryResult {
         private final int COURSE_ID;
 
         public TeacherCourse(String courseName, int courseId) {
-            this.COURSE_NAME = courseName;
-            this.COURSE_ID = courseId;
+            COURSE_NAME = courseName;
+            COURSE_ID = courseId;
         }
 
         public String getCourseName() {
@@ -40,15 +44,15 @@ public class QueryResult {
 
     public static class StudentInfo {
 
-        private final int studentId;
-        private final String firstName;
-        private final String lastName;
+        private final int STUDENT_ID;
+        private final String FIRST_NAME;
+        private final String LAST_NAME;
         private final Date birthDate;
 
         public StudentInfo(int studentId, String firstName, String lastName, Date birthDate) {
-            this.studentId = studentId;
-            this.firstName = firstName;
-            this.lastName = lastName;
+            this.STUDENT_ID = studentId;
+            this.FIRST_NAME = firstName;
+            this.LAST_NAME = lastName;
             this.birthDate = birthDate;
         }
 
@@ -57,62 +61,75 @@ public class QueryResult {
         }
 
         public String getLastName() {
-            return lastName;
+            return LAST_NAME;
         }
 
         public String getFirstName() {
-            return firstName;
+            return FIRST_NAME;
         }
 
         public int getStudentId() {
-            return studentId;
+            return STUDENT_ID;
         }
     }
 
     public static class StudentCourseInfo {
 
-        private final String courseName;
-        private final int totalCards;
-        private final int dueCards;
-        private final int newCards;
+        private final String COURSE_NAME;
+        private final int TEACHER_ID;
+        private final int TOTAL_CARDS;
+        private final int DUE_CARDS;
+        private final int NEW_CARDS;
+        private final Instant modificationDate;
 
-        public StudentCourseInfo(String courseName, int totalCards, int dueCards, int newCards) {
-            this.courseName = courseName;
-            this.totalCards = totalCards;
-            this.dueCards = dueCards;
-            this.newCards = newCards;
+        public StudentCourseInfo(String courseName, int teacherId, int totalCards, int dueCards, int newCards, Timestamp modificationDate) {
+            COURSE_NAME = courseName;
+            TEACHER_ID = teacherId;
+            TOTAL_CARDS = totalCards;
+            DUE_CARDS = dueCards;
+            NEW_CARDS = newCards;
+            System.out.println(modificationDate);
+            this.modificationDate = modificationDate.toInstant();
         }
 
         public String getCourseName() {
-            return courseName;
+            return COURSE_NAME;
         }
 
         public int getTotalCards() {
-            return totalCards;
+            return TOTAL_CARDS;
         }
 
         public int getDueCards() {
-            return dueCards;
+            return DUE_CARDS;
         }
 
         public int getNewCards() {
-            return newCards;
+            return NEW_CARDS;
+        }
+
+        public int getTeacherId() {
+            return TEACHER_ID;
+        }
+
+        public Instant getModificationDate() {
+            return modificationDate;
         }
     }
 
     public static class CardReview {
 
-        private final int cardId;
-        private final int courseId;
-        private final int studentId;
-        private final String nextReview;
+        private final int CARD_ID;
+        private final int COURSE_ID;
+        private final int STUDENT_ID;
+        private final String NEXT_REVIEW;
         private final int[] buttonValues;
 
         public CardReview(int cardId, int courseId, int studentId, String nextReview, int[] buttonValues) {
-            this.cardId = cardId;
-            this.courseId = courseId;
-            this.studentId = studentId;
-            this.nextReview = nextReview;
+            CARD_ID = cardId;
+            COURSE_ID = courseId;
+            STUDENT_ID = studentId;
+            NEXT_REVIEW = nextReview;
             this.buttonValues = buttonValues;
         }
 
@@ -121,19 +138,19 @@ public class QueryResult {
         }
 
         public String getNextReview() {
-            return nextReview;
+            return NEXT_REVIEW;
         }
 
         public int getStudentId() {
-            return studentId;
+            return STUDENT_ID;
         }
 
         public int getCourseId() {
-            return courseId;
+            return COURSE_ID;
         }
 
         public int getCardId() {
-            return cardId;
+            return CARD_ID;
         }
     }
 
@@ -141,7 +158,6 @@ public class QueryResult {
 
         private final int[] cardButtonStat;
         private final double[] difficultyStat;
-
 
         public CourseStats(int[] cardButtonStat, double[] difficultyStat) {
             this.cardButtonStat = cardButtonStat;

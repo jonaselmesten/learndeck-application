@@ -4,16 +4,16 @@ import deck.Deck;
 import deck.DeckUtil;
 import deck.IOStatus;
 import menu.user.User;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
+import menu.user.UserType;
+import org.apache.commons.net.ftp.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 
 /**<h1>ServerConnection</h1>
@@ -25,23 +25,24 @@ public class ServerConnection implements AutoCloseable {
 
     private final static Logger logger = LogManager.getLogger(ServerConnection.class);
 
-    private final static int PORT_NUMBER = 0;
-    private final static String SERVER_IP = ""; // TO DO: Can it be stored/fetched in another way?
+    private final static int PORT_NUMBER = 65500;
+    private final static String SERVER_IP = "192.168.0.126"; // TO DO: Can it be stored/fetched in another way?
 
     private final static String STUDENT_LOG_IN = "learndeckstudent";
     private final static String TEACHER_LOG_IN = "learndeckteacher";
-    private final static String PASSWORD = ""; // TO DO: Can it be stored/fetched in another way?
+    private final static String PASSWORD = "8yu4n6z8456!"; // TO DO: Can it be stored/fetched in another way?
 
-    private final List<Deck> coursesToUpload = new ArrayList<>();
-    private final List<String> coursesToRemove = new ArrayList<>();
     private final FTPClient ftpClient;
     private final User user;
 
     private Map<String, Instant> fileInstant;
-    private InputStream inputStream;
-    private OutputStream outputStream;
     private String userFolderName;
 
+    /**
+     * Establishes a connection and logs in the user.
+     * @param user Current user.
+     * @throws IOException Occurs when a connection couldn't be established or if the user log in failed - Either way this renders the created object useless.
+     */
     public ServerConnection(User user) throws IOException {
 
         this.user = user;
@@ -49,22 +50,20 @@ public class ServerConnection implements AutoCloseable {
         ftpClient = new FTPClient();
         ftpClient.connect(SERVER_IP,PORT_NUMBER);
 
-        int replyCode = ftpClient.getReplyCode();
+        logServerReply();
+        DeckUtil.createDefaultDirectory();
 
-        if(!FTPReply.isPositiveCompletion(replyCode)) {
-            logger.info("Server error - Code:" + replyCode);
-            return;
-        }else
+        if(FTPReply.isPositiveCompletion(ftpClient.getReplyCode()))
             userLogIn();
+        else {
 
-        showServerReply(ftpClient);
+            logger.info("A connection could not be established to the server.");
+
+            close();
+            throw new FTPConnectionClosedException("A connection could not be established.");
+        }
     }
 
-
-    /**
-     * Log in to the server and change to the correct directory.
-     * @throws IOException When log in error.
-     */
     private void userLogIn() throws IOException {
 
         switch(user.getUserType()) {
@@ -85,26 +84,10 @@ public class ServerConnection implements AutoCloseable {
                 throw new IllegalStateException("Unexpected value: " + user.toString());
         }
 
-        userFolderName = user.getUserType().name() + "_" + user.getUserId();
+        userFolderName = user.getUserType().name().concat("_") + user.getUserId();
     }
 
-
-
-    /**
-     * Add a course to be uploaded when uploadCourses() is called.
-     * @param deck Course to add.
-     */
-    public void addCourseToUpload(Deck deck) {
-        coursesToUpload.add(deck);
-    }
-
-
-    /**
-     * Get the modification date as an instant object of a file.
-     * @param courseName Name of the file.
-     * @return Instant of the file.
-     * @throws IOException
-     */
+    //Get the modification date as an instant object of a file.
     private Instant getFileInstant(String courseName) throws IOException {
 
         //Get all the files at once when called first time.
@@ -121,61 +104,81 @@ public class ServerConnection implements AutoCloseable {
             return fileInstant.get(courseName);
     }
 
+    //TO DO: Check file modification date.
+    //TO DO: Add last update to database.
+    public void downloadCourseFile(String courseName, UserType userType, String directory) throws IOException {
+
+        String pathToFileFTP = directory.concat("\\").concat(courseName).concat(".txt");
+        File file = new File(DeckUtil.getDeckPath() + "\\".concat(courseName).concat(".txt"));
+
+        ftpClient.enterLocalPassiveMode();
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+        changeDirectoryTo(userType);
+
+        //Will write over already saved files on PC.
+        try(OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+
+            boolean success = ftpClient.retrieveFile(pathToFileFTP, outputStream);
+
+            if(success)
+                logger.info(user.getUserType() + " - " + user.getUserId() + " downloaded " + courseName + " to PC.");
+            else
+                logger.debug(user.getUserType() + " - " + user.getUserId() + " couldn't download " + courseName + " to PC.");
+
+            logServerReply();
+        }
+    }
 
     /**
-     * IMPORTANT: You need to add courses to upload with: addCourseToUpload() before you call this method.
-     * Upload all the courses added.
-     * @throws IOException
+     * Upload a course to the FTP-server.
+     * @throws IOException When error occurred while trying to upload file.
      */
-    public void uploadCourses()   { //TO DO: Check modification times(?), Decide on upload method.
+    public void uploadCourseFile(Deck course) throws IOException { //TO DO: Check modification times(?), Decide on upload method.
 
-        //Change to the right directory and create users own sub-directory if necessary.
-        try {
-            changeDirectoryToUser(user);
+        changeDirectoryToUser();
 
-            if(coursesToUpload.isEmpty())
-                return;
+        ftpClient.enterLocalPassiveMode();
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-        }catch(IOException e) {
-            logger.error("Error while trying to change or create directory for user:" + user.toString(), e);
+        //Just try to upload updated/new courses.
+        if(course.getIoStatus().equals(IOStatus.UNCHANGED))
             return;
-        }
 
-        for(Deck course : coursesToUpload) {
+        try(InputStream inputStream = new FileInputStream(DeckUtil.getCoursePath(course.getCourseName()).toString())) {
 
-            //Just try to upload updated/new courses.
-            if(course.getIoStatus().equals(IOStatus.UNCHANGED))
-                continue;
+            boolean success  = ftpClient.storeFile(course.getCourseName().concat(".txt"), inputStream);
 
-            try{
-                inputStream = new FileInputStream(DeckUtil.getCoursePath(course.getCourseName()).toString());
-                outputStream = ftpClient.storeFileStream(course.getCourseName() + ".txt");
+            if(success)
+                logger.info(user.getUserType() + " - " + user.getUserId() + " uploaded " + course.getCourseName() + " to server.");
+            else
+                logger.debug(user.getUserType() + " - " + user.getUserId() + " couldn't upload " + course.getCourseName() + " to server.");
 
-                byte[] bytesIn = new byte[4096];
-                int bytesRead = 0;
-
-                while((bytesRead = inputStream.read(bytesIn)) != -1)
-                    outputStream.write(bytesIn, 0, bytesRead);
-
-            }catch(IOException e) {
-                logger.error("Error occured while trying to upload course to server. Course:" + course.getCourseId() + " ID:" + course.getCourseName(), e);
-            }
-
-            showServerReply(ftpClient);
+            logServerReply();
         }
     }
 
 
     /**
-     * Change directory to the current users'.
-     * Create a new one if necessary.
-     * @param user Current user.
-     * @throws IOException When directory could not me created.
+     * Remove all courses that has been added with addCourseToBeRemoved();
+     * @throws IOException When error occurred while trying to remove courses.
      */
-    private void changeDirectoryToUser(User user) throws IOException { //TO DO: Add STUDENT action.
+    public void removeCourseFile(Deck course) throws IOException {
+
+        if(course.getIoStatus().equals(IOStatus.NEW))
+            return;
+
+        changeDirectoryToUser();
+
+        if(!ftpClient.deleteFile(course.getCourseName().concat(".txt")))
+            logger.error("Could not delete file:" + course.getCourseName());
+
+        logServerReply();
+    }
+
+
+     //Change directory to the current users'.
+    private void changeDirectoryToUser() throws IOException {
 
         //Try to change directory, create a new one for the user if necessary.
         switch(user.getUserType()) {
@@ -199,16 +202,29 @@ public class ServerConnection implements AutoCloseable {
         }
     }
 
+    //Goes back to root - Can then chose either Student or Teacher main folder.
+    private void changeDirectoryTo(UserType userType) throws IOException {
 
-    /** Log all the server replies.*/
-    private static void showServerReply(FTPClient ftpClient) {
+        ftpClient.changeToParentDirectory();
+
+        switch(userType) {
+
+            case STUDENT:
+                ftpClient.changeWorkingDirectory(Directories.STUDENT.folderName);
+                break;
+            case TEACHER:
+                ftpClient.changeWorkingDirectory(Directories.TEACHER.folderName);
+        }
+    }
+
+    private void logServerReply() {
 
         String[] serverReplies = ftpClient.getReplyStrings();
 
         if(!Objects.isNull(serverReplies) && serverReplies.length > 0) {
 
-            for (String aReply : serverReplies) {
-                logger.info("SERVER: " + aReply);
+            for (String reply : serverReplies) {
+                logger.info("Server reply: " + reply);
             }
         }
     }
@@ -217,30 +233,13 @@ public class ServerConnection implements AutoCloseable {
     public void close() {
 
         try {
-            inputStream.close();
-
             if (ftpClient.isConnected()) {
                 ftpClient.logout();
                 ftpClient.disconnect();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Could not log out/disconnect  form server.", e);
         }
     }
 
-    public void addCourseToBeRemoved(String courseName) {
-        coursesToRemove.add(courseName);
-    }
-
-    public void removeFiles() throws IOException {
-
-        if(coursesToRemove.isEmpty())
-            return;
-
-        for(String courseName :  coursesToRemove) {
-
-            if(!ftpClient.deleteFile(courseName))
-                logger.debug("Could not delete file:" + courseName);
-        }
-    }
 }

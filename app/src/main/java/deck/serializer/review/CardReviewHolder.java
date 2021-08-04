@@ -1,4 +1,4 @@
-package deck.serializer;
+package deck.serializer.review;
 
 import java.util.*;
 

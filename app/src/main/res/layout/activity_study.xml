@@ -19,17 +19,28 @@
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
+                    android:id="@+id/questionAnswerLayout"
                     android:layout_height="wrap_content">
-                <TextView
-                        android:text="TextView"
+
+                <LinearLayout
+                        android:id="@+id/questionLayout"
+                        android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:id="@+id/textView3"/>
+                        android:layout_height="match_parent">
+                </LinearLayout>
                 <View
                         android:id="@+id/divider2"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@android:color/darker_gray"
                 />
+                <LinearLayout
+                        android:id="@+id/answerLayout"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                </LinearLayout>
+
                 <ImageButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" app:srcCompat="@drawable/logo"
@@ -38,8 +49,10 @@
         </ScrollView>
 
         <LinearLayout
+                android:id="@+id/buttonRow"
                 android:orientation="horizontal"
                 android:gravity="bottom|end"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
             <Button
@@ -47,7 +60,7 @@
                     android:textColor="@color/black"
                     android:backgroundTint="@color/red"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/hard" android:layout_weight="1"/>
+                    android:layout_height="wrap_content" android:id="@+id/hardButton" android:layout_weight="1"/>
             <Space
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_weight="1"/>
@@ -56,7 +69,7 @@
                     android:textColor="@color/black"
                     android:backgroundTint="#FFBF00"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/medium" android:layout_weight="1"/>
+                    android:layout_height="wrap_content" android:id="@+id/mediumButton" android:layout_weight="1"/>
             <Space
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_weight="1"/>
@@ -65,7 +78,7 @@
                     android:textColor="@color/black"
                     android:backgroundTint="#9CFB02"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/easy" android:layout_weight="1"/>
+                    android:layout_height="wrap_content" android:id="@+id/easyButton" android:layout_weight="1"/>
             <Space
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_weight="1"/>
@@ -74,7 +87,7 @@
                     android:textColor="@color/black"
                     android:backgroundTint="@color/green"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/very_easy" android:layout_weight="1"/>
+                    android:layout_height="wrap_content" android:id="@+id/veryEasyButton" android:layout_weight="1"/>
         </LinearLayout>
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

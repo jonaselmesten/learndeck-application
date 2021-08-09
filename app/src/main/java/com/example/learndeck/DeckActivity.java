@@ -11,13 +11,11 @@ public class DeckActivity extends AppCompatActivity {
 
     public class DeckLine {
 
-        private Context context;
         private final String name;
         private final int cardCount;
         private final int dueCount;
 
-        DeckLine(Context context, String name, int cardCount, int dueCount) {
-            this.context = context;
+        DeckLine(String name, int cardCount, int dueCount) {
             this.name = name;
             this.cardCount = cardCount;
             this.dueCount = dueCount;
@@ -33,18 +31,18 @@ public class DeckActivity extends AppCompatActivity {
             params.setMargins(30,0,30,0);
 
             //Texts.
-            TextView deckName = new TextView(context);
+            TextView deckName = new TextView(getApplicationContext());
             deckName.setText(name);
 
-            TextView cardCount = new TextView(context);
+            TextView cardCount = new TextView(getApplicationContext());
             String cardString = "Cards:" + cardCount.toString();
             cardCount.setText("Cards: 343");
 
-            TextView dueCount = new TextView(context);
+            TextView dueCount = new TextView(getApplicationContext());
             dueCount.setText("Due: 22");
 
             //Buttons.
-            Button studyButton = new Button(context);
+            Button studyButton = new Button(getApplicationContext());
             studyButton.setText("Study");
             studyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -55,10 +53,10 @@ public class DeckActivity extends AppCompatActivity {
                 }
             });
 
-            ImageButton optionButton = new ImageButton(context);
+            ImageButton optionButton = new ImageButton(getApplicationContext());
             optionButton.setImageResource(R.drawable.logo);
 
-            LinearLayout layout = new LinearLayout(context);
+            LinearLayout layout = new LinearLayout(getApplicationContext());
             layout.setOrientation(LinearLayout.HORIZONTAL);
             layout.setLayoutParams(params);
 
@@ -87,9 +85,9 @@ public class DeckActivity extends AppCompatActivity {
 
         //https://spring.io/blog/2009/03/27/rest-in-spring-3-resttemplate/
 
-        deckList.addView(new DeckLine(this, "Math ABCaaaaa", 1,2).getLayout());
-        deckList.addView(new DeckLine(this, "Math ABC", 1,2).getLayout());
-        deckList.addView(new DeckLine(this, "Math ABC", 1,2).getLayout());
+        deckList.addView(new DeckLine("Math ABCaaaaa", 1,2).getLayout());
+        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
+        deckList.addView(new DeckLine( "Math ABC", 1,2).getLayout());
 
     }
 }

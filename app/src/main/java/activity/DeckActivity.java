@@ -44,17 +44,19 @@ public class DeckActivity extends AppCompatActivity {
             //Buttons.
             Button studyButton = new Button(getApplicationContext());
             studyButton.setText("Study");
-            studyButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), StudyActivity.class);
-                    intent.putExtra("courseId", name);
-                    startActivity(intent);
-                }
+            studyButton.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), StudyActivity.class);
+                intent.putExtra("courseId", name);
+                startActivity(intent);
             });
 
             ImageButton optionButton = new ImageButton(getApplicationContext());
             optionButton.setImageResource(R.drawable.logo);
+            optionButton.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), SettingsActivity.class);
+                intent.putExtra("courseId", name);
+                startActivity(intent);
+            });
 
             LinearLayout layout = new LinearLayout(getApplicationContext());
             layout.setOrientation(LinearLayout.HORIZONTAL);

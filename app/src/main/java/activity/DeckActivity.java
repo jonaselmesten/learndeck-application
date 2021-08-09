@@ -1,11 +1,11 @@
-package com.example.learndeck;
+package activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import com.example.learndeck.R;
 
 public class DeckActivity extends AppCompatActivity {
 

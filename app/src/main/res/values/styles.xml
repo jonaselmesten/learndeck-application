@@ -4,7 +4,7 @@
     </style>
 
     <style name="Widget.Theme.MyApplication.ButtonBar.Fullscreen" parent="">
-        <item name="android:background">@color/black_overlay</item>
+        <item name="android:background">@drawable/bkg_side</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 

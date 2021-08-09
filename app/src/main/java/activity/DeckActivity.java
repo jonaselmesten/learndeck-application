@@ -3,6 +3,7 @@ package activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.*;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.learndeck.R;
@@ -82,7 +83,6 @@ public class DeckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_deck);
-
         LinearLayout deckList = findViewById(R.id.deckList);
 
         //https://spring.io/blog/2009/03/27/rest-in-spring-3-resttemplate/

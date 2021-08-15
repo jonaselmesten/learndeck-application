@@ -1,9 +1,9 @@
 package deck;
 
 
+import android.os.Build;
+import androidx.annotation.RequiresApi;
 import deck.card.Card;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -14,7 +14,6 @@ import java.util.*;
  * unless the status of a card or the deck is "new" or "changed".
  * </p>
  * <p>Decks are naturally sorted by their course names.</p>
- * @author Jonas Elmesten
  */
 public class Deck implements Comparable<Deck> {
 
@@ -43,6 +42,7 @@ public class Deck implements Comparable<Deck> {
     public void sortCardsAfterReviewDate() {
 
         cardList.sort(new Comparator<Card>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public int compare(Card o1, Card o2) {
                return o1.getNextReview().compareTo(o2.getNextReview());
@@ -94,6 +94,6 @@ public class Deck implements Comparable<Deck> {
 
     @Override
     public String toString() {
-        return "Course name:" + COURSE_NAME + " Id:" + COURSE_ID + " Size:" + getDeckSize() + " IoStatus:" + getIoStatus();
+        return "Course name:" + COURSE_NAME + " Id:" + COURSE_ID + " Size:" + getDeckSize();
     }
 }

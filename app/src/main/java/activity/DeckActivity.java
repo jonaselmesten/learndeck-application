@@ -89,6 +89,8 @@ public class DeckActivity extends AppCompatActivity {
 
         deckList.addView(new DeckLine("Math ABCaaaaa", 1,2).getLayout());
         deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
+        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
+        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
         deckList.addView(new DeckLine( "Math ABC", 1,2).getLayout());
 
     }

@@ -1,13 +1,14 @@
 package deck.search;
 
-import com.mysql.cj.xdevapi.Collection;
 import deck.Deck;
 import deck.card.Card;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CardTextSearcher {
 
@@ -40,7 +41,7 @@ public class CardTextSearcher {
 
     private void startThreads() {
 
-        //Gather information to distribute the search over all of the search threads.
+        //Gather information to distribute the search over all the search threads.
         List<Card> list = deck.getImmutableList();
         int listSize = list.size();
         int listSizeDivided = listSize / THREAD_COUNT;

@@ -1,5 +1,8 @@
 package deck.card;
 
+import android.os.Build;
+import androidx.annotation.RequiresApi;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -11,7 +14,6 @@ import java.util.Arrays;
  * The information it decides upon is the amount of times each button has been pushed for this card by the student and the general difficulty - which is based on all students performance.<br/>
  * Hard - Medium - Easy - Very easy
  * It stores the information in an array: [Hard, Medium, Easy, Very easy];
- * @author Jonas Elmesten
  */
 class ReviewInfo {
 
@@ -74,6 +76,7 @@ class ReviewInfo {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private LocalDate calculateNextReview(CardButtons buttonPushed, LocalDate currentNextReview, double generalDifficulty) {
 
         LocalDate nextReview = currentNextReview;

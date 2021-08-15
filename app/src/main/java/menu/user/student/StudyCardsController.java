@@ -1,6 +1,5 @@
 package menu.user.student;
 
-import database.DatabaseUtil;
 import deck.Deck;
 import deck.card.Card;
 import deck.card.CardButtons;

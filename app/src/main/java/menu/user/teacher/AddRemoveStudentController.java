@@ -1,7 +1,5 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
-import database.QueryResult;
 import deck.Deck;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

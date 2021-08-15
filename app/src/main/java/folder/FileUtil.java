@@ -3,7 +3,6 @@ package folder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import deck.Deck;
-import deck.IOStatus;
 import deck.serializer.DeckDeserializer;
 import deck.serializer.DeckSerializer;
 import menu.user.User;

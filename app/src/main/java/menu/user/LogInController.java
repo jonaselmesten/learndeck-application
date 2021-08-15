@@ -1,7 +1,5 @@
 package menu.user;
 
-import database.DatabaseUtil;
-import deck.DeckUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;

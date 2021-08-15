@@ -1,6 +1,5 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
 import deck.Deck;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;

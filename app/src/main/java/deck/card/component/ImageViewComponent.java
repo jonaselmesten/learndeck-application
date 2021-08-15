@@ -1,12 +1,6 @@
 package deck.card.component;
 
 import deck.card.CardComponent;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-
-import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,7 +36,6 @@ public class ImageViewComponent implements CardComponent {
         return byteOutput.toByteArray();
     }
 
-    /**@return javafx.scene.image.ImageView*/
     @Override
     public ImageView convertToNode() {
 

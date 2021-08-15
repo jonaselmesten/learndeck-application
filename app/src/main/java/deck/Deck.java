@@ -16,13 +16,11 @@ import java.util.*;
  * <p>Decks are naturally sorted by their course names.</p>
  * @author Jonas Elmesten
  */
-public class Deck implements Comparable<Deck>, IOObject {
+public class Deck implements Comparable<Deck> {
 
-    private final static Logger logger = LogManager.getLogger(Deck.class);
     private final List<Card> cardList = new ArrayList<>();
     private final String COURSE_NAME;
 
-    private IOStatus ioStatus = IOStatus.UNCHANGED;
     private final int COURSE_ID;
 
     public Deck(String COURSE_NAME, int COURSE_ID) {
@@ -31,29 +29,18 @@ public class Deck implements Comparable<Deck>, IOObject {
     }
 
     public void addCard(Card card) {
-
-        logger.debug("Method call:addCard CourseName:" + COURSE_NAME +" Id:" + COURSE_ID + "CardId:" + card.getCardId());
         cardList.add(card);
     }
 
     public void removeCard(Card card) {
-
-        logger.debug("Method call:removeCard CourseName:" + COURSE_NAME +" Id:" + COURSE_ID + "CardId:" + card.getCardId());
-
-        ioStatus = IOStatus.CHANGED;
         cardList.remove(card);
     }
 
     public void sortCardsAfterId() {
-
-        logger.debug("Method call:sortCardsAfterId CourseName:" + COURSE_NAME + " Id:" + COURSE_ID + " - Sorting deck with Collections.sort()");
-
         Collections.sort(cardList);
     }
 
     public void sortCardsAfterReviewDate() {
-
-        logger.debug("Method call:sortAfterReviews CourseNameId" + COURSE_NAME + COURSE_ID + " - Sorting deck with Comparator");
 
         cardList.sort(new Comparator<Card>() {
             @Override
@@ -61,18 +48,6 @@ public class Deck implements Comparable<Deck>, IOObject {
                return o1.getNextReview().compareTo(o2.getNextReview());
             }
         });
-    }
-
-    @Override
-    public void setIoStatus(IOStatus ioStatus) {
-
-        logger.debug("Method call:setIoStatus CourseNameId:" + COURSE_NAME + COURSE_ID + "Setting Io-status to:" +ioStatus.toString());
-        this.ioStatus = ioStatus;
-    }
-
-    @Override
-    public IOStatus getIoStatus() {
-        return ioStatus;
     }
 
     public List<Card> getImmutableList() {

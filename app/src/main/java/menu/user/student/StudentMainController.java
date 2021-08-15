@@ -1,9 +1,6 @@
 package menu.user.student;
 
-import database.DatabaseUtil;
-import database.QueryResult;
 import deck.Deck;
-import deck.DeckUtil;
 import deck.card.Card;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

@@ -1,8 +1,6 @@
 package server;
 
 import deck.Deck;
-import deck.DeckUtil;
-import deck.IOStatus;
 import menu.user.User;
 import menu.user.UserType;
 import org.apache.commons.net.ftp.*;

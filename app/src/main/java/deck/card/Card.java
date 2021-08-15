@@ -2,8 +2,6 @@ package deck.card;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import deck.IOObject;
-import deck.IOStatus;
 import deck.card.component.CardComponents;
 import deck.card.component.SeparatorComponent;
 import javafx.geometry.Pos;

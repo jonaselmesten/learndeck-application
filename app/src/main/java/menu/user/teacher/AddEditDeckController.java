@@ -1,9 +1,6 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
 import deck.Deck;
-import deck.DeckUtil;
-import deck.IOStatus;
 import deck.card.Card;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

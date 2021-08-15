@@ -1,8 +1,6 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
 import deck.Deck;
-import deck.IOStatus;
 import deck.card.Card;
 import deck.card.component.ImageViewComponent;
 import deck.card.component.SeparatorComponent;

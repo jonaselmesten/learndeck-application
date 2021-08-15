@@ -1,10 +1,6 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
-import database.QueryResult;
 import deck.Deck;
-import deck.DeckUtil;
-import deck.IOStatus;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;

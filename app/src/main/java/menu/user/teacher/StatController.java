@@ -1,7 +1,5 @@
 package menu.user.teacher;
 
-import database.DatabaseUtil;
-import database.QueryResult;
 import deck.Deck;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;

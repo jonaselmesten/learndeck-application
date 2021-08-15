@@ -1,6 +1,5 @@
 package menu.user;
 
-import database.DatabaseUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Window;
@@ -9,10 +8,7 @@ import menu.WindowUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Date;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 
 public class CreateUserController implements ChangeableWindow {

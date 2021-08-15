@@ -1,9 +1,10 @@
 package activity;
 
+import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.*;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.learndeck.R;
@@ -29,18 +30,16 @@ public class DeckActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     1f
             );
-            params.setMargins(30,0,30,0);
+            params.setMargins(30,10,30,0);
 
             //Texts.
             TextView deckName = new TextView(getApplicationContext());
             deckName.setText(name);
+            deckName.setTypeface(deckName.getTypeface(), Typeface.BOLD);
+            deckName.setTextSize(15);
 
-            TextView cardCount = new TextView(getApplicationContext());
-            String cardString = "Cards:" + cardCount.toString();
-            cardCount.setText("Cards: 343");
-
-            TextView dueCount = new TextView(getApplicationContext());
-            dueCount.setText("Due: 22");
+            TextView dueCountText = new TextView(getApplicationContext());
+            dueCountText.setText("Due:" + dueCount);
 
             //Buttons.
             Button studyButton = new Button(getApplicationContext());
@@ -63,13 +62,10 @@ public class DeckActivity extends AppCompatActivity {
             layout.setOrientation(LinearLayout.HORIZONTAL);
             layout.setLayoutParams(params);
 
-            deckName.setLayoutParams(params);
-            cardCount.setLayoutParams(params);
-            dueCount.setLayoutParams(params);
+            dueCountText.setLayoutParams(params);
 
             layout.addView(deckName);
-            layout.addView(cardCount);
-            layout.addView(dueCount);
+            layout.addView(dueCountText);
             layout.addView(studyButton);
             layout.addView(optionButton);
 
@@ -87,11 +83,11 @@ public class DeckActivity extends AppCompatActivity {
 
         //https://spring.io/blog/2009/03/27/rest-in-spring-3-resttemplate/
 
-        deckList.addView(new DeckLine("Math ABCaaaaa", 1,2).getLayout());
-        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
-        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
-        deckList.addView(new DeckLine("Math ABC", 1,2).getLayout());
-        deckList.addView(new DeckLine( "Math ABC", 1,2).getLayout());
+        deckList.addView(new DeckLine("Japanese - Words", 7568,32).getLayout());
+        deckList.addView(new DeckLine("Japanese - Kanji", 2013,55).getLayout());
+        deckList.addView(new DeckLine("Japanese - Grammar", 1,26).getLayout());
+        deckList.addView(new DeckLine("Programming - Java", 15,3).getLayout());
+        deckList.addView(new DeckLine("Programming - Python", 55,44).getLayout());
 
     }
 }

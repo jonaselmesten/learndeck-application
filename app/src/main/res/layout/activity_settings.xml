@@ -14,19 +14,61 @@
         <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
             <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                <LinearLayout
-                        android:orientation="horizontal"
+
+                <TextView
+                        android:text="Course name:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                    <TextView
-                            android:text="TextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:id="@+id/textView" android:layout_weight="1"/>
-                </LinearLayout>
+                        android:layout_height="wrap_content" android:id="@+id/name"/>
+
+                <TextView
+                        android:text="General difficulty:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/difficulty"/>
+
+                <TextView
+                        android:text="Cards:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/cards"/>
+
+                <TextView
+                        android:text="Hard:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/hard"/>
+
+                <TextView
+                        android:text="Medium:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/medium"/>
+
+                <TextView
+                        android:text="Easy:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/easy"/>
+
+                <TextView
+                        android:text="Very easy:"
+                        android:paddingBottom="10dp"
+                        android:textSize="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/veryEasy"/>
+
                 <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
@@ -36,7 +78,13 @@
                             android:layout_width="wrap_content"
                             android:textColor="@color/black"
                             android:backgroundTint="@color/red"
-                            android:layout_height="wrap_content" android:id="@+id/button" android:layout_weight="1"/>
+                            android:layout_height="wrap_content" android:id="@+id/removeDeckButton" android:layout_weight="1"/>
+                    <Button
+                            android:text="Reset reviews"
+                            android:layout_width="wrap_content"
+                            android:textColor="@color/black"
+                            android:backgroundTint="@color/red"
+                            android:layout_height="wrap_content" android:id="@+id/resetViewsButton" android:layout_weight="1"/>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

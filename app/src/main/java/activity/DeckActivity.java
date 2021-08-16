@@ -1,26 +1,32 @@
 package activity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.learndeck.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DeckActivity extends AppCompatActivity {
 
-    public class DeckLine {
+    final static Map<Integer, LinearLayout> deckMap = new HashMap<>();
+    static LinearLayout deckList;
+
+    class DeckLine {
 
         private final String name;
         private final int cardCount;
         private final int dueCount;
+        private int courseId;
 
-        DeckLine(String name, int cardCount, int dueCount) {
+        DeckLine(String name, int cardCount, int dueCount, int courseId) {
             this.name = name;
             this.cardCount = cardCount;
             this.dueCount = dueCount;
+            this.courseId = courseId;
         }
 
         LinearLayout getLayout() {
@@ -40,13 +46,16 @@ public class DeckActivity extends AppCompatActivity {
 
             TextView dueCountText = new TextView(getApplicationContext());
             dueCountText.setText("Due:" + dueCount);
+            dueCountText.setTextSize(15);
+
+            LinearLayout layout = new LinearLayout(getApplicationContext());
 
             //Buttons.
             Button studyButton = new Button(getApplicationContext());
             studyButton.setText("Study");
             studyButton.setOnClickListener(view -> {
                 Intent intent = new Intent(view.getContext(), StudyActivity.class);
-                intent.putExtra("courseId", name);
+                intent.putExtra("courseId", courseId);
                 startActivity(intent);
             });
 
@@ -54,20 +63,22 @@ public class DeckActivity extends AppCompatActivity {
             optionButton.setImageResource(R.drawable.logo);
             optionButton.setOnClickListener(view -> {
                 Intent intent = new Intent(view.getContext(), SettingsActivity.class);
-                intent.putExtra("courseId", name);
+                intent.putExtra("courseId", courseId);
                 startActivity(intent);
             });
 
-            LinearLayout layout = new LinearLayout(getApplicationContext());
             layout.setOrientation(LinearLayout.HORIZONTAL);
             layout.setLayoutParams(params);
 
+            dueCountText.setLayoutParams(params);
             dueCountText.setLayoutParams(params);
 
             layout.addView(deckName);
             layout.addView(dueCountText);
             layout.addView(studyButton);
             layout.addView(optionButton);
+
+            deckMap.put(courseId, layout);
 
             return layout;
         }
@@ -77,17 +88,19 @@ public class DeckActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_deck);
-        LinearLayout deckList = findViewById(R.id.deckList);
 
-        //https://spring.io/blog/2009/03/27/rest-in-spring-3-resttemplate/
+        deckList =findViewById(R.id.deckList);
 
-        deckList.addView(new DeckLine("Japanese - Words", 7568,32).getLayout());
-        deckList.addView(new DeckLine("Japanese - Kanji", 2013,55).getLayout());
-        deckList.addView(new DeckLine("Japanese - Grammar", 1,26).getLayout());
-        deckList.addView(new DeckLine("Programming - Java", 15,3).getLayout());
-        deckList.addView(new DeckLine("Programming - Python", 55,44).getLayout());
-
+        loadDecks();
     }
+
+    private void loadDecks() {
+        deckList.addView(new DeckLine("Japanese - Words", 7568,32, 1).getLayout());
+        deckList.addView(new DeckLine("Japanese - Kanji", 2013,55, 2).getLayout());
+        deckList.addView(new DeckLine("Japanese - Grammar", 1,26, 3).getLayout());
+        deckList.addView(new DeckLine("Programming - Java", 15,3, 4).getLayout());
+        deckList.addView(new DeckLine("Programming - Python", 55,44, 5).getLayout());
+    }
+
 }

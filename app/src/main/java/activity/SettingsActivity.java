@@ -1,8 +1,9 @@
 package activity;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.learndeck.R;
@@ -14,6 +15,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
 
         Button removeDeckButton = findViewById(R.id.removeDeckButton);
         removeDeckButton.setOnClickListener(view -> {
@@ -53,6 +55,9 @@ public class SettingsActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Yes",
                         (dialog, id) -> {
+                            int courseId = getIntent().getExtras().getInt("courseId");
+                            LinearLayout layout = DeckActivity.deckMap.get(courseId);
+                            DeckActivity.deckList.removeView(layout);
                             finish();
                         })
 

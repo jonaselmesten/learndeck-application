@@ -55,7 +55,6 @@ public class StudyActivity extends AppCompatActivity {
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
-
         answerLayout.addView(question);
         questionLayout.addView(answer);
 

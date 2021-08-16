@@ -6,28 +6,21 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:windowBackground">@color/activityBackground</item>
         <item name="actionBarStyle">@style/CustomActionBarTheme</item>
     </style>
 
-    <style name="study_button">
+    <style name="StudyButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
     </style>
 
     <style name="CustomActionBarTheme" parent="Theme.AppCompat.Light">
-        <item name="android:text">asdasdasdsa</item>
-        <item name="android:actionBarStyle">@style/NewActionBar2</item>
-        <item name="background">@drawable/logo</item>
+        <item name="background">@drawable/bkg_side</item>
     </style>
 
-    <style name="NewActionBar2" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:background">@drawable/logo</item>
+    <style name="DynamicText">
+
     </style>
 
-    <color name="colorPrimary">#00AD31</color>
-    <color name="colorPrimaryDark">#036900</color>
-    <color name="colorAccent">#99DD2C</color>
-    <color name="activityBackground">#DB1607</color>
 </resources>

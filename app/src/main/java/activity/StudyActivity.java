@@ -1,11 +1,10 @@
 package activity;
 
-import android.app.ActionBar;
-import android.content.Intent;
+import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import com.example.learndeck.R;
 
 import java.util.Random;
@@ -51,15 +50,15 @@ public class StudyActivity extends AppCompatActivity {
         });
 
         //Add next card.
-        TextView question = new TextView(this);
-        question.setText("QUESTION TEST");
-        TextView answer = new TextView(this);
-        answer.setText("ANSWER TEST");
+        TextView question = getTextView("QUESTION" + Integer.toString(new Random().nextInt(234234)));
+        TextView answer = getTextView("ANSWER" + Integer.toString(new Random().nextInt(234234)));
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
+
         answerLayout.addView(question);
         questionLayout.addView(answer);
+
         answerLayout.setVisibility(View.GONE);
     }
 
@@ -91,10 +90,8 @@ public class StudyActivity extends AppCompatActivity {
         answerLayout.setVisibility(View.GONE);
 
         //Add next card.
-        TextView question = new TextView(this);
-        question.setText("QUESTION" + Integer.toString(new Random().nextInt(234234)));
-        TextView answer = new TextView(this);
-        answer.setText("AANSWER" + Integer.toString(new Random().nextInt(234234)));
+        TextView question = getTextView("QUESTION" + Integer.toString(new Random().nextInt(234234)));
+        TextView answer = getTextView("ANSWER" + Integer.toString(new Random().nextInt(234234)));
 
         answerLayout.addView(answer);
         questionLayout.addView(question);
@@ -115,6 +112,16 @@ public class StudyActivity extends AppCompatActivity {
 
         showToast("Next review: xxxx-xx-xx");
         nextCard();
+    }
+
+    private TextView getTextView(String text) {
+
+        TextView textView = new TextView(this);
+        textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        textView.setTextSize(20);
+        textView.setText(text);
+
+        return textView;
     }
 
 }

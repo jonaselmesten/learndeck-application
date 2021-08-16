@@ -11,20 +11,22 @@
             android:theme="@style/AppTheme">
 
         <activity
-                android:name="activity.SettingsActivity">
-        </activity>
-
-        <activity
-                android:name="activity.StudyActivity">
-        </activity>
-
-        <activity
                 android:name="activity.DeckActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+
+
+        <activity
+                android:name="activity.SettingsActivity">
+        </activity>
+
+
+        <activity
+                android:name="activity.StudyActivity">
         </activity>
 
     </application>

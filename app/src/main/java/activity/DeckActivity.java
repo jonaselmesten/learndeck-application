@@ -6,8 +6,14 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.learndeck.R;
+import connection.ConnectionException;
+import connection.DeckDao;
+import connection.UserDao;
+import model.Deck;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DeckActivity extends AppCompatActivity {
@@ -92,10 +98,45 @@ public class DeckActivity extends AppCompatActivity {
 
         deckList =findViewById(R.id.deckList);
 
-        loadDecks();
+        UserDao userDao = new UserDao();
+        DeckDao deckDao = new DeckDao();
+
+        List<Deck> decks = new ArrayList<>();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    decks.addAll(deckDao.getAllFromUser(1));
+
+                    System.out.println("_:_::__:_:_:_:");
+                    System.out.println("SIZE:" + decks.size());
+
+                } catch (ConnectionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        loadDecks(decks);
     }
 
-    private void loadDecks() {
+    private void loadDecks(List<Deck> decks) {
+
+        for(Deck deck : decks) {
+            deckList.addView(new DeckLine(deck.getCourseName(), 7568,32, 1).getLayout());
+            System.out.println("________________________________");
+            System.out.println(deck.getCourseName());
+        }
+
         deckList.addView(new DeckLine("Japanese - Words", 7568,32, 1).getLayout());
         deckList.addView(new DeckLine("Japanese - Kanji", 2013,55, 2).getLayout());
         deckList.addView(new DeckLine("Japanese - Grammar", 1,26, 3).getLayout());

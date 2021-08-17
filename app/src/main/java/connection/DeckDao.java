@@ -1,39 +1,15 @@
 package connection;
 
+import exceptions.ConnectionException;
 import model.Deck;
 
 import java.util.List;
 import java.util.Optional;
 
-public class DeckDao implements Dao<Deck> {
+interface DeckDao {
 
-    WebserviceConnection connection = new WebserviceConnection();
+    List<Deck> getAll() throws ConnectionException;
 
-    @Override
-    public Optional<Deck> get(long id) {
-        return Optional.empty();
-    }
+    void deleteFromUser(long id) throws ConnectionException;
 
-    @Override
-    public List<Deck> getAll() {
-        return null;
-    }
-
-    @Override
-    public List<Deck> getAllFromUser(long userId) throws ConnectionException {
-        return connection.getUserDecks(userId);
-    }
-
-    @Override
-    public void update(Deck deck, String[] params) {
-
-    }
-
-    @Override
-    public void delete(Deck deck) {
-
-    }
-
-    public void deleteDeckFromUser(int userId) throws ConnectionException{
-    }
 }

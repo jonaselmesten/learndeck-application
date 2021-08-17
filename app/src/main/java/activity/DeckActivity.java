@@ -6,8 +6,8 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.learndeck.R;
-import connection.ConnectionException;
-import connection.DeckDao;
+import exceptions.ConnectionException;
+import connection.DeckConnection;
 import model.Deck;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class DeckActivity extends AppCompatActivity {
 
     final static Map<Integer, LinearLayout> deckMap = new HashMap<>();
     final static ExecutorService executor = Executors.newSingleThreadExecutor();
-    static final int USER_ID = 1;
+    public static final int USER_ID = 1;
     static LinearLayout deckList;
 
 
@@ -39,13 +39,13 @@ public class DeckActivity extends AppCompatActivity {
      */
     private void loadDecks() {
 
-        DeckDao deckDao = new DeckDao();
+        DeckConnection deckDao = new DeckConnection();
         List<Deck> decks = new ArrayList<>();
 
         //Fetch all decks.
         executor.execute(() -> {
             try {
-                decks.addAll(deckDao.getAllFromUser(USER_ID));
+                decks.addAll(deckDao.getAll());
             } catch (ConnectionException e) {
                 Toast toast = Toast.makeText(getApplicationContext(),"Connection error",Toast.LENGTH_SHORT);
                 toast.show();
@@ -66,12 +66,6 @@ public class DeckActivity extends AppCompatActivity {
             toast.show();
             return;
         }
-
-        deckList.addView(createDeckLine("Japanese - Words", 7568, 1));
-        deckList.addView(createDeckLine("Japanese - Words", 7568, 2));
-        deckList.addView(createDeckLine("Japanese - Words", 7568, 3));
-        deckList.addView(createDeckLine("Japanese - Words", 7568, 4));
-        deckList.addView(createDeckLine("Japanese - Words", 7568, 5));
     }
 
 

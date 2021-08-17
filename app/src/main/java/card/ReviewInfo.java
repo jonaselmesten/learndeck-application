@@ -1,4 +1,4 @@
-package deck.card;
+package card;
 
 import android.os.Build;
 import androidx.annotation.RequiresApi;

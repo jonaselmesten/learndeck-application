@@ -1,49 +1,53 @@
 package connection;
 
+import exceptions.ConnectionException;
 import model.Deck;
 import model.DeckResponse;
 import model.User;
-import rest.DeckService;
-import rest.UserService;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import service.DeckService;
+import service.UserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static activity.DeckActivity.USER_ID;
+
+/**
+ * <h1>WebserviceConnection</h1>
+ * This class hides all the backend HTTP calls for the application.
+ */
 class WebserviceConnection {
 
     private final String BASE_URL = "http://10.0.2.2:8080";
 
-    public Optional<User> getUser(long id) {
+    public Optional<User> getUser(long id) throws ConnectionException {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        Optional<User> user;
+
         UserService service = retrofit.create(UserService.class);
 
-        service.getUser(1).enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User user = response.body();
-                System.out.println(user.getUserId());
-                System.out.println(user.getUserType());
-            }
+        try {
+            Response<User> response = service.getUser(USER_ID).execute();
 
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            if(response.isSuccessful())
+                user = Optional.of(response.body());
+            else throw new ConnectionException("Could not get resource");
 
-            }
-        });
+        } catch (IOException | ConnectionException e) {
+            throw new ConnectionException("Could not get resource");
+        }
 
-        return null;
+        return user;
     }
 
     public List<Deck> getUserDecks(long userId) throws ConnectionException {

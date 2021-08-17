@@ -6,9 +6,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.learndeck.R;
-import connection.CardDao;
-import connection.ConnectionException;
-import connection.DeckDao;
+import connection.CardConnection;
+import exceptions.ConnectionException;
+import connection.DeckConnection;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,8 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
      */
     private void executeDeckAction(Actions action) throws Exception {
 
-        CardDao cardDao = new CardDao();
-        DeckDao deckDao = new DeckDao();
+        CardConnection cardDao = new CardConnection();
+        DeckConnection deckDao = new DeckConnection();
         AtomicBoolean taskFailed = new AtomicBoolean(false);
 
         executor.execute(() -> {
@@ -47,10 +47,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                 switch (action) {
                     case DELETE_DECK:
-                        deckDao.deleteDeckFromUser(USER_ID);
+                        deckDao.deleteFromUser(USER_ID);
                         break;
                     case RESET_REVIEWS:
-                        cardDao.resetAllReviews(USER_ID);
+                        cardDao.resetReviews();
                         break;
                 }
 

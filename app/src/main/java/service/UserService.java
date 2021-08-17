@@ -1,4 +1,4 @@
-package rest;
+package service;
 
 import model.User;
 import retrofit2.Call;

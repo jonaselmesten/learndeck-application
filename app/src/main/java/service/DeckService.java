@@ -1,4 +1,4 @@
-package rest;
+package service;
 
 import model.DeckResponse;
 import retrofit2.Call;

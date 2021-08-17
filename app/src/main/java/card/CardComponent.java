@@ -1,6 +1,4 @@
-package deck.card;
-
-import deck.card.component.CardComponents;
+package card;
 
 
 public interface CardComponent {

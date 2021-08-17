@@ -1,45 +1,76 @@
 package model;
 
 import com.google.gson.annotations.SerializedName;
+import card.Card;
 
-public class Deck {
+import java.util.*;
 
-    @SerializedName("userId")
-    Long userId;
+/**<h1>Deck</h1>
+ *
+ */
+public class Deck implements Comparable<Deck> {
+
+    private final List<Card> cardList = new ArrayList<>();
 
     @SerializedName("courseId")
-    Long courseId;
-
+    private final Long courseId;
     @SerializedName("courseName")
-    String courseName;
+    private String courseName;
 
-    public Deck(long userId, long courseId, String courseName) {
-        this.userId = userId;
-        this.courseId = courseId;
+    public Deck(String courseName, long courseId) {
         this.courseName = courseName;
+        this.courseId = courseId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public void addCard(Card card) {
+        cardList.add(card);
     }
 
-    public String getCourseName() {
-        return courseName;
+    public void removeCard(Card card) {
+        cardList.remove(card);
+    }
+
+    public void sortCardsAfterId() {}
+
+    public void sortCardsAfterReviewDate() {}
+
+    public List<Card> getImmutableList() {
+        return Collections.unmodifiableList(cardList);
+    }
+
+    public ListIterator<Card> getCardIterator() {
+        return cardList.listIterator();
+    }
+
+    public int getDeckSize() {
+        return cardList.size();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj == this) return true;
+        if(!(obj instanceof Deck)) return false;
+        Deck deck = (Deck) obj;
+
+        return this.courseId.equals(deck.getCourseId());
+    }
+
+    @Override
+    public int hashCode() { return courseId.intValue(); }
+
+    @Override
+    public int compareTo(Deck deck) {
+        return this.courseId.compareTo(deck.courseId);
     }
 
     public Long getCourseId() {
         return courseId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public String getCourseName() {
+        return courseName;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
 }
+

@@ -20,6 +20,7 @@ public class DeckActivity extends AppCompatActivity {
 
     final static Map<Integer, LinearLayout> deckMap = new HashMap<>();
     final static ExecutorService executor = Executors.newSingleThreadExecutor();
+    static final int USER_ID = 1;
     static LinearLayout deckList;
 
 
@@ -44,7 +45,7 @@ public class DeckActivity extends AppCompatActivity {
         //Fetch all decks.
         executor.execute(() -> {
             try {
-                decks.addAll(deckDao.getAllFromUser(1));
+                decks.addAll(deckDao.getAllFromUser(USER_ID));
             } catch (ConnectionException e) {
                 Toast toast = Toast.makeText(getApplicationContext(),"Connection error",Toast.LENGTH_SHORT);
                 toast.show();

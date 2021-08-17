@@ -33,4 +33,7 @@ public class DeckDao implements Dao<Deck> {
     public void delete(Deck deck) {
 
     }
+
+    public void deleteDeckFromUser(int userId) throws ConnectionException{
+    }
 }

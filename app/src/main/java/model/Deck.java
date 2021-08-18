@@ -16,10 +16,13 @@ public class Deck implements Comparable<Deck> {
     private final Long courseId;
     @SerializedName("courseName")
     private String courseName;
+    @SerializedName("dueCount")
+    private int dueCount;
 
-    public Deck(String courseName, long courseId) {
+    public Deck(String courseName, long courseId, int dueCount) {
         this.courseName = courseName;
         this.courseId = courseId;
+        this.dueCount = dueCount;
     }
 
     public void addCard(Card card) {
@@ -71,6 +74,8 @@ public class Deck implements Comparable<Deck> {
     public String getCourseName() {
         return courseName;
     }
+
+    public int getDueCount() { return dueCount; }
 
 }
 

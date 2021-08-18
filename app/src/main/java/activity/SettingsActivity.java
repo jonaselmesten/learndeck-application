@@ -1,14 +1,19 @@
 package activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.androidplot.pie.PieChart;
+import com.androidplot.pie.Segment;
+import com.androidplot.pie.SegmentFormatter;
+import com.androidplot.util.PixelUtils;
 import com.example.learndeck.R;
 import connection.CardConnection;
-import exceptions.ConnectionException;
 import connection.DeckConnection;
+import exceptions.ConnectionException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,8 +33,36 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        pieChartSetup(10,10,10,10);
+
         findViewById(R.id.removeDeckButton).setOnClickListener(view -> removeDeckButtonPushed());
         findViewById(R.id.resetViewsButton).setOnClickListener(view -> {resetReviewsButtonPushed();});
+    }
+
+    private void pieChartSetup(int hard, int medium, int easy, int veryEasy) {
+
+        PieChart pie = findViewById(R.id.chart);
+
+        Segment hardSeg = new Segment("Hard", hard);
+        Segment mediumSeg = new Segment("Medium", medium);
+        Segment easySeg = new Segment("Easy", easy);
+        Segment veryEasySeg = new Segment("Very easy", veryEasy);
+
+        final float padding = PixelUtils.dpToPix(30);
+        pie.getPie().setPadding(padding, padding, padding, padding);
+
+        SegmentFormatter formatHard = new SegmentFormatter(Color.RED);
+        SegmentFormatter formatMedium = new SegmentFormatter(Color.YELLOW);
+        SegmentFormatter formatEasy = new SegmentFormatter(Color.rgb(1,195,6));
+        SegmentFormatter formatVeryEasy = new SegmentFormatter(Color.GREEN);
+
+        pie.addSegment(hardSeg, formatHard);
+        pie.addSegment(mediumSeg, formatMedium);
+        pie.addSegment(easySeg, formatEasy);
+        pie.addSegment(veryEasySeg, formatVeryEasy);
+
+        pie.getBorderPaint().setColor(Color.TRANSPARENT);
+        pie.getBackgroundPaint().setColor(Color.TRANSPARENT);
     }
 
     /**

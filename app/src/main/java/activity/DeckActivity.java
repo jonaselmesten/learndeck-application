@@ -59,7 +59,7 @@ public class DeckActivity extends AppCompatActivity {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
             for(Deck deck : decks)
-                deckList.addView(createDeckLine(deck.getCourseName(), 7568, deck.getCourseId().intValue()));
+                deckList.addView(createDeckLine(deck.getCourseName(), deck.getDueCount(), deck.getCourseId().intValue()));
 
         } catch (InterruptedException e) {
             Toast toast = Toast.makeText(getApplicationContext(),"Connection error",Toast.LENGTH_SHORT);

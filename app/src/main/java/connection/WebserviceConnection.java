@@ -11,7 +11,6 @@ import service.DeckService;
 import service.UserService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,27 +31,21 @@ class WebserviceConnection {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        Optional<User> user;
-
         UserService service = retrofit.create(UserService.class);
 
         try {
             Response<User> response = service.getUser(USER_ID).execute();
 
             if(response.isSuccessful())
-                user = Optional.of(response.body());
+                return Optional.of(response.body());
             else throw new ConnectionException("Could not get resource");
 
         } catch (IOException | ConnectionException e) {
             throw new ConnectionException("Could not get resource");
         }
-
-        return user;
     }
 
     public List<Deck> getUserDecks(long userId) throws ConnectionException {
-
-        List<Deck> deckList = new ArrayList<>();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -65,14 +58,12 @@ class WebserviceConnection {
             Response<DeckResponse> response = service.getUserDecks(userId).execute();
 
             if(response.isSuccessful())
-                deckList = response.body().getResponse().getDeckList();
+                return response.body().getResponse().getDeckList();
             else throw new ConnectionException("Could not get resource");
 
         } catch (IOException | ConnectionException e) {
             throw new ConnectionException("Could not get resource");
         }
-
-        return deckList;
     }
 
 }

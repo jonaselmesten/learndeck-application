@@ -41,34 +41,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" android:id="@+id/cards"/>
 
-                <TextView
-                        android:text="Hard:"
-                        android:paddingBottom="10dp"
-                        android:textSize="20dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:id="@+id/hard"/>
+                <com.androidplot.pie.PieChart
+                        android:id="@+id/chart"
+                        android:stretchMode="columnWidth"
+                        android:layout_height="400dp"
+                        android:layout_width="400dp"/>
 
                 <TextView
-                        android:text="Medium:"
-                        android:paddingBottom="10dp"
-                        android:textSize="20dp"
+                        android:text="Hard:0 Medium:0 Easy:0 Very easy:0"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:id="@+id/medium"/>
-
-                <TextView
-                        android:text="Easy:"
-                        android:paddingBottom="10dp"
-                        android:textSize="20dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:id="@+id/easy"/>
-
-                <TextView
-                        android:text="Very easy:"
-                        android:paddingBottom="10dp"
-                        android:textSize="20dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:id="@+id/veryEasy"/>
-
+                        android:layout_height="wrap_content" android:id="@+id/textView"/>
                 <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"

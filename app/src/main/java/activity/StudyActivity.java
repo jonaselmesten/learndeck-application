@@ -5,20 +5,36 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import card.Card;
 import com.example.learndeck.R;
+import model.Deck;
 
 import java.util.Random;
 
 public class StudyActivity extends AppCompatActivity {
 
     private enum Buttons {HARD, MEDIUM, EASY, VERY_EASY}
+    private Deck deck = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study);
 
-        String courseId = getIntent().getExtras().getString("courseId");
+        int courseId = getIntent().getExtras().getInt("courseId");
+
+        deck = loadDeck(courseId);
+        guiSetup(deck.getNextReview());
+    }
+
+    private Deck loadDeck(int courseId) {
+
+        Deck deck = DeckActivity.getDeck(courseId);
+
+        return deck;
+    }
+
+    private void guiSetup(Card firstCard) {
 
         ImageButton showAnswerButton = findViewById(R.id.imageButton);
         showAnswerButton.setOnClickListener(view -> {
@@ -49,9 +65,9 @@ public class StudyActivity extends AppCompatActivity {
             buttonPushed(Buttons.VERY_EASY);
         });
 
-        //Add next card.
-        TextView question = getTextView("QUESTION" + Integer.toString(new Random().nextInt(234234)));
-        TextView answer = getTextView("ANSWER" + Integer.toString(new Random().nextInt(234234)));
+        //Load first review.
+        View question = firstCard.loadQuestionGui();
+        View answer = firstCard.loadAnswerGui();
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
@@ -61,11 +77,6 @@ public class StudyActivity extends AppCompatActivity {
         answerLayout.setVisibility(View.GONE);
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-    }
-
     private void showToast(String message) {
         Toast toast = Toast.makeText(getApplicationContext(),
                 message,
@@ -73,7 +84,11 @@ public class StudyActivity extends AppCompatActivity {
         toast.show();
     }
 
-    private void nextCard() {
+    /**
+     * Cleans up the old card.
+     * Then hides the answer part and makes the button row invisible.
+     */
+    private void nextCardGui() {
 
         ImageButton showAnswerButton = findViewById(R.id.imageButton);
         LinearLayout buttonRow = findViewById(R.id.buttonRow);
@@ -87,15 +102,33 @@ public class StudyActivity extends AppCompatActivity {
         answerLayout.removeAllViews();
         questionLayout.removeAllViews();
         answerLayout.setVisibility(View.GONE);
+    }
 
-        //Add next card.
-        TextView question = getTextView("QUESTION" + Integer.toString(new Random().nextInt(234234)));
-        TextView answer = getTextView("ANSWER" + Integer.toString(new Random().nextInt(234234)));
+    /**
+     * Resets the GUI for a new card to review.
+     * The button row is hidden and only the question part is loaded.
+     */
+    private void nextCard() {
 
+        nextCardGui();
+
+        //Load next review.
+        Card card = deck.getNextReview();
+
+        View question = card.loadQuestionGui();
+        View answer = card.loadAnswerGui();
+
+        LinearLayout answerLayout = findViewById(R.id.answerLayout);
+        LinearLayout questionLayout = findViewById(R.id.questionLayout);
         answerLayout.addView(answer);
         questionLayout.addView(question);
     }
 
+    /**
+     * Handles all logic for updating all the review data for the current card.
+     * Will calculate the next review data given the current one.
+     * @param button Button pushed by the user.
+     */
     private void buttonPushed(Buttons button) {
 
         switch (button) {
@@ -111,16 +144,6 @@ public class StudyActivity extends AppCompatActivity {
 
         showToast("Next review: xxxx-xx-xx");
         nextCard();
-    }
-
-    private TextView getTextView(String text) {
-
-        TextView textView = new TextView(this);
-        textView.setGravity(Gravity.CENTER_HORIZONTAL);
-        textView.setTextSize(20);
-        textView.setText(text);
-
-        return textView;
     }
 
 }

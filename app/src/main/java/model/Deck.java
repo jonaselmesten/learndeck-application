@@ -77,5 +77,8 @@ public class Deck implements Comparable<Deck> {
 
     public int getDueCount() { return dueCount; }
 
+    public Card getNextReview() {
+        return cardList.get(0);
+    }
 }
 

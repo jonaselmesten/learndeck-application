@@ -1,5 +1,7 @@
 package card;
 
+import android.view.View;
+
 import java.util.*;
 
 /**<h1>Card</h1>
@@ -20,6 +22,14 @@ public class Card implements Comparable<Card> {
     private Card(CardBuilder builder) {
         this.CARD_ID = builder.CARD_ID;
         this.cardComponentList = builder.cardComponentList;
+    }
+
+    public View loadQuestionGui() {
+        return null;
+    }
+
+    public View loadAnswerGui() {
+        return null;
     }
 
     public static class CardBuilder {

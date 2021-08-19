@@ -141,7 +141,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 //Remove the deck from the GUI in DeckActivity.
                 int courseId = getIntent().getExtras().getInt("courseId");
-                LinearLayout layout = DeckActivity.deckMap.get(courseId);
+                LinearLayout layout = DeckActivity.deckGuiMap.get(courseId);
                 DeckActivity.deckList.removeView(layout);
 
                 finish();

@@ -1,12 +1,15 @@
 package connection;
 
+import card.Card;
 import exceptions.ConnectionException;
+import model.CardResponse;
 import model.Deck;
 import model.DeckResponse;
 import model.User;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import service.CardService;
 import service.DeckService;
 import service.UserService;
 
@@ -66,4 +69,24 @@ class WebserviceConnection {
         }
     }
 
+    public List<Card> getDeckCards(int courseId, int userId) throws ConnectionException {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        CardService service = retrofit.create(CardService.class);
+
+        try {
+            Response<CardResponse> response = service.getUserReviewCards(userId, courseId).execute();
+
+            if(response.isSuccessful())
+                return response.body().getResponse().getCardList();
+            else throw new ConnectionException("Could not get resource");
+
+        } catch (IOException | ConnectionException e) {
+            throw new ConnectionException("Could not get resource");
+        }
+    }
 }

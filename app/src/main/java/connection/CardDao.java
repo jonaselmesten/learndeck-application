@@ -11,6 +11,6 @@ interface CardDao {
 
     void resetReviews() throws ConnectionException;
 
-    List<Card> getCards(int courseId);
+    List<Card> getCards(int courseId) throws ConnectionException;
 
 }

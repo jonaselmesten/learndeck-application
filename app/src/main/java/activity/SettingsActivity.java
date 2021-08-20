@@ -93,7 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         //Wait for thread to finish.
-        if (taskFailed.get() == false) {
+        if (!taskFailed.get()) {
             executor.shutdown();
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } else {
@@ -141,8 +141,9 @@ public class SettingsActivity extends AppCompatActivity {
 
                 //Remove the deck from the GUI in DeckActivity.
                 int courseId = getIntent().getExtras().getInt("courseId");
-                LinearLayout layout = DeckActivity.deckGuiMap.get(courseId);
-                DeckActivity.deckList.removeView(layout);
+                LinearLayout layout = DeckActivity.getDeckLayout(courseId);
+                DeckActivity activity = (DeckActivity) getParent();
+                activity.removeDeckLine(layout);
 
                 finish();
 

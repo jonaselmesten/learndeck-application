@@ -1,16 +1,20 @@
 package activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import card.Card;
 import com.amplifyframework.AmplifyException;
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
 import com.example.learndeck.R;
+import connection.CardConnection;
 import connection.DeckConnection;
 import exceptions.ConnectionException;
 import exceptions.ResourceException;
@@ -18,6 +22,7 @@ import file.FileSystem;
 import model.Deck;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,81 +33,103 @@ import java.util.concurrent.TimeUnit;
 
 public class DeckActivity extends AppCompatActivity {
 
-    final static Map<Integer, LinearLayout> deckGuiMap = new HashMap<>();
+    private final static ExecutorService executor = Executors.newSingleThreadExecutor();
     private final static Map<Integer, Deck> deckMap = new HashMap<>();
-    final static ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final static Map<Integer, LinearLayout> deckGuiMap = new HashMap<>();
 
+    private LinearLayout deckList;
+    private String EXT_CACHE_DIR;
+    private String CACHE_DIR;
+    //TODO: Temporary.
     public static final int USER_ID = 1;
 
-    static LinearLayout deckList;
 
     public static Deck getDeck(int courseId) {
-
         Deck deck = deckMap.get(courseId);
-
         return deck;
+    }
+
+    public static LinearLayout getDeckLayout(int courseId) {
+        return deckGuiMap.get(courseId);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
-
-        deckList =findViewById(R.id.deckList);
+        deckList = findViewById(R.id.deckList);
+        EXT_CACHE_DIR = getApplicationContext().getExternalCacheDir().getPath();
+        CACHE_DIR = getApplicationContext().getCacheDir().getPath();
 
         try {
             Amplify.addPlugin(new AWSCognitoAuthPlugin());
             Amplify.addPlugin(new AWSS3StoragePlugin());
             Amplify.configure(getApplicationContext());
-            Log.i("MyAmplifyApp", "Initialized Amplify");
+            Log.i("Start up", "Initialized Amplify");
         } catch (AmplifyException error) {
-            Log.e("MyAmplifyApp", "Could not initialize Amplify", error);
+            Log.e("Start up", "Could not initialize Amplify", error);
         }
 
-        try {
-            File file = FileSystem.getResource("minini");
-        } catch (ResourceException e) {
-            e.printStackTrace();
-        }
+        //Fetch & load all relevant data for all the decks.
+        executor.execute(() -> {
 
-        //loadDecks();
+            try {
+                loadDecks();
+            } catch (ConnectionException e) {
+                e.printStackTrace();
+            }
+
+        });
+    }
+
+    /**
+     * Removes a deck line from the GUI.
+     * @param layout Layout to remove.
+     */
+    public void removeDeckLine(LinearLayout layout) {
+        deckList.removeView(layout);
     }
 
 
     /**
      * Fetches all decks from the webservice and adds them to the GUI.
      */
-    private void loadDecks() {
+    private void loadDecks() throws ConnectionException {
 
         DeckConnection deckDao = new DeckConnection();
-        List<Deck> decks = new ArrayList<>();
 
+        //TODO: Fetch from disk first.
         //Fetch all decks.
-        executor.execute(() -> {
-            try {
-                decks.addAll(deckDao.getAll());
-            } catch (ConnectionException e) {
-                Toast toast = Toast.makeText(getApplicationContext(),"Connection error",Toast.LENGTH_SHORT);
-                toast.show();
-                return;
-            }
-        });
+        List<Deck> decks = new ArrayList<>(deckDao.getAll());
 
-        //Wait for thread to finish before adding decks to GUI.
-        try {
-            executor.shutdown();
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        for(Deck deck : decks) {
 
-            for(Deck deck : decks) {
-                deckList.addView(createDeckLine(deck.getCourseName(), deck.getDueCount(), deck.getCourseId().intValue()));
-                deckMap.put(deck.getCourseId().intValue(), deck);
-            }
+            fillDeck(deck);
 
-        } catch (InterruptedException e) {
-            Toast toast = Toast.makeText(getApplicationContext(),"Connection error",Toast.LENGTH_SHORT);
-            toast.show();
-            return;
+            addDeckToGUI(deck);
+            deckMap.put(deck.getCourseId().intValue(), deck);
         }
+
+    }
+
+    private void fillDeck(Deck deck) throws ConnectionException {
+
+        CardConnection cardDao = new CardConnection();
+
+        List<Card> cards = cardDao.getCards(deck.getCourseId().intValue());
+
+        for(Card card : cards)
+            System.out.println(card.toString());
+
+    }
+
+    private void addDeckToGUI(Deck deck) {
+        runOnUiThread(() -> {
+            deckList.addView(createDeckLine(
+                    deck.getCourseName(),
+                    deck.getDueCount(),
+                    deck.getCourseId().intValue()));
+        });
     }
 
 

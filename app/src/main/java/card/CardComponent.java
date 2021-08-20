@@ -1,15 +1,19 @@
 package card;
 
+/**<h1>Card components</h1>
+ * This enum contains all the components that a card can consist of.
+ */
+public enum CardComponent {
 
-public interface CardComponent {
+    TEXT, IMG_TEXT;
 
-    /**Returns the component as it's "raw" form.
-     * @return Decided in the implementation.
-     */
-    Object getRawObject();
-
-    /**Returns the components' enum instance.
-     * @return CardComponents
-     */
-    CardComponents getComponentEnum();
+    public static CardComponent from(String questionType) throws IncorrectCardFormatException {
+        switch (questionType) {
+            case "TEXT":
+                return TEXT;
+            case "IMG_TEXT":
+                return IMG_TEXT;
+        }
+        throw new IncorrectCardFormatException("Could not create CardComponent enum from string");
+    }
 }

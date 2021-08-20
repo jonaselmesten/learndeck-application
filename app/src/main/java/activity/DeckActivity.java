@@ -14,6 +14,9 @@ import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
 import com.example.learndeck.R;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import connection.CardConnection;
 import connection.DeckConnection;
 import exceptions.ConnectionException;
@@ -22,6 +25,7 @@ import file.FileSystem;
 import model.Deck;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,7 +79,7 @@ public class DeckActivity extends AppCompatActivity {
 
             try {
                 loadDecks();
-            } catch (ConnectionException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -94,7 +98,7 @@ public class DeckActivity extends AppCompatActivity {
     /**
      * Fetches all decks from the webservice and adds them to the GUI.
      */
-    private void loadDecks() throws ConnectionException {
+    private void loadDecks() throws IOException {
 
         DeckConnection deckDao = new DeckConnection();
 
@@ -112,7 +116,7 @@ public class DeckActivity extends AppCompatActivity {
 
     }
 
-    private void fillDeck(Deck deck) throws ConnectionException {
+    private void fillDeck(Deck deck) throws IOException {
 
         CardConnection cardDao = new CardConnection();
 
@@ -120,7 +124,6 @@ public class DeckActivity extends AppCompatActivity {
 
         for(Card card : cards)
             System.out.println(card.toString());
-
     }
 
     private void addDeckToGUI(Deck deck) {

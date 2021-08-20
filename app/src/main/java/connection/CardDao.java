@@ -3,6 +3,7 @@ package connection;
 import card.Card;
 import exceptions.ConnectionException;
 
+import java.io.IOException;
 import java.util.List;
 
 interface CardDao {
@@ -11,6 +12,6 @@ interface CardDao {
 
     void resetReviews() throws ConnectionException;
 
-    List<Card> getCards(int courseId) throws ConnectionException;
+    List<Card> getCards(int courseId) throws ConnectionException, IOException;
 
 }

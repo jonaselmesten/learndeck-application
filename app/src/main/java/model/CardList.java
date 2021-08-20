@@ -1,6 +1,5 @@
 package model;
 
-import card.Card;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
@@ -9,9 +8,9 @@ import java.util.List;
 public class CardList {
 
     @SerializedName("cardReviewList")
-    private List<Card> cardList;
+    private List<CardResponse> cardList;
 
-    public List<Card> getCardList() {
+    public List<CardResponse> getCardList() {
         if(this.cardList == null || this.cardList.isEmpty())
             return Collections.emptyList();
         else

@@ -1,11 +1,9 @@
 package connection;
 
 import card.Card;
+import card.IncorrectCardFormatException;
 import exceptions.ConnectionException;
-import model.CardResponse;
-import model.Deck;
-import model.DeckResponse;
-import model.User;
+import model.*;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -14,7 +12,10 @@ import service.DeckService;
 import service.UserService;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static activity.DeckActivity.USER_ID;
@@ -43,7 +44,7 @@ class WebserviceConnection {
                 return Optional.of(response.body());
             else throw new ConnectionException("Could not get resource");
 
-        } catch (IOException | ConnectionException e) {
+        } catch (IOException e) {
             throw new ConnectionException("Could not get resource");
         }
     }
@@ -58,18 +59,18 @@ class WebserviceConnection {
         DeckService service = retrofit.create(DeckService.class);
 
         try {
-            Response<DeckResponse> response = service.getUserDecks(userId).execute();
+            Response<ListResponse<DeckList>> response = service.getUserDecks(userId).execute();
 
             if(response.isSuccessful())
-                return response.body().getResponse().getDeckList();
+                return response.body().getList().getDeckList();
             else throw new ConnectionException("Could not get resource");
 
-        } catch (IOException | ConnectionException e) {
+        } catch (IOException e) {
             throw new ConnectionException("Could not get resource");
         }
     }
 
-    public List<Card> getDeckCards(int courseId, int userId) throws ConnectionException {
+    public List<Card> getDeckCards(int courseId, int userId) throws IOException {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -77,16 +78,24 @@ class WebserviceConnection {
                 .build();
 
         CardService service = retrofit.create(CardService.class);
+        Response<ListResponse<CardList>> response = service.getUserReviewCards(userId, courseId).execute();
 
-        try {
-            Response<CardResponse> response = service.getUserReviewCards(userId, courseId).execute();
+        if(!response.isSuccessful())
+            throw new ConnectionException("Response unsuccessful:" + response.errorBody());
 
-            if(response.isSuccessful())
-                return response.body().getResponse().getCardList();
-            else throw new ConnectionException("Could not get resource");
+        List<CardResponse> responseList = Objects.requireNonNull(response.body()).getList().getCardList();
+        List<Card> cardList = new ArrayList<>();
 
-        } catch (IOException | ConnectionException e) {
-            throw new ConnectionException("Could not get resource");
+        //Try to add all valid cards from the response.
+        for (CardResponse card : responseList) {
+            try {
+                cardList.add(Card.fromResponse(card));
+            } catch (IncorrectCardFormatException | ParseException e) {
+                e.printStackTrace();
+            }
         }
+
+        return cardList;
     }
+
 }

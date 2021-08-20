@@ -1,6 +1,6 @@
 package card;
 
-public class IncorrectCardFormatException extends RuntimeException {
+public class IncorrectCardFormatException extends Exception {
     public IncorrectCardFormatException(String message) {
         super(message);
     }

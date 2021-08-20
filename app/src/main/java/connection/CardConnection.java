@@ -4,6 +4,7 @@ import activity.DeckActivity;
 import card.Card;
 import exceptions.ConnectionException;
 
+import java.io.IOException;
 import java.util.List;
 
 import static activity.DeckActivity.USER_ID;
@@ -23,7 +24,7 @@ public class CardConnection implements CardDao {
     }
 
     @Override
-    public List<Card> getCards(int courseId) throws ConnectionException {
+    public List<Card> getCards(int courseId) throws IOException {
         return connection.getDeckCards(courseId, USER_ID);
     }
 }

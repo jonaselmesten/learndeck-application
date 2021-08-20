@@ -17,9 +17,13 @@ import java.util.Arrays;
  */
 class ReviewInfo {
 
-    private final int[] buttonValues = {0,0,0,0};
+    private final int[] buttonValues;
     private int mediumPushCount = 0;
     private int easyPushCount = 0;
+
+    ReviewInfo(int[] buttonValues) {
+        this.buttonValues = buttonValues;
+    }
 
     /**
      * This method will increment one of the 4 elements in the array with 1.

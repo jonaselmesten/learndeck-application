@@ -66,8 +66,8 @@ public class StudyActivity extends AppCompatActivity {
         });
 
         //Load first review.
-        View question = firstCard.loadQuestionGui();
-        View answer = firstCard.loadAnswerGui();
+        View question = firstCard.loadQuestionGui(getApplicationContext());
+        View answer = firstCard.loadAnswerGui(getApplicationContext());
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
@@ -115,8 +115,8 @@ public class StudyActivity extends AppCompatActivity {
         //Load next review.
         Card card = deck.getNextReview();
 
-        View question = card.loadQuestionGui();
-        View answer = card.loadAnswerGui();
+        View question = card.loadQuestionGui(getApplicationContext());
+        View answer = card.loadAnswerGui(getApplicationContext());
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);

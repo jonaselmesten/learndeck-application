@@ -2,51 +2,36 @@ package activity;
 
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.media.VolumeShaper;
-import android.os.HandlerThread;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.*;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.cognitoidentity.AmazonCognitoIdentityClient;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amplifyframework.AmplifyException;
-import com.amplifyframework.api.aws.AWSApiPlugin;
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import com.amplifyframework.core.Amplify;
-import com.amplifyframework.core.Consumer;
-import com.amplifyframework.core.async.AmplifyOperation;
-import com.amplifyframework.datastore.AWSDataStorePlugin;
-import com.amplifyframework.storage.StorageItem;
-import com.amplifyframework.storage.options.StorageDownloadFileOptions;
-import com.amplifyframework.storage.options.StorageGetUrlOptions;
-import com.amplifyframework.storage.result.StorageGetUrlResult;
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
 import com.example.learndeck.R;
-import exceptions.ConnectionException;
 import connection.DeckConnection;
+import exceptions.ConnectionException;
+import exceptions.ResourceException;
+import file.FileSystem;
 import model.Deck;
 
-import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class DeckActivity extends AppCompatActivity {
 
     final static Map<Integer, LinearLayout> deckGuiMap = new HashMap<>();
     private final static Map<Integer, Deck> deckMap = new HashMap<>();
     final static ExecutorService executor = Executors.newSingleThreadExecutor();
+
     public static final int USER_ID = 1;
 
     static LinearLayout deckList;
@@ -55,11 +40,8 @@ public class DeckActivity extends AppCompatActivity {
 
         Deck deck = deckMap.get(courseId);
 
-
-
         return deck;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,22 +54,18 @@ public class DeckActivity extends AppCompatActivity {
             Amplify.addPlugin(new AWSCognitoAuthPlugin());
             Amplify.addPlugin(new AWSS3StoragePlugin());
             Amplify.configure(getApplicationContext());
-
             Log.i("MyAmplifyApp", "Initialized Amplify");
         } catch (AmplifyException error) {
             Log.e("MyAmplifyApp", "Could not initialize Amplify", error);
         }
 
-        loadDecks();
-    }
+        try {
+            File file = FileSystem.getResource("minini");
+        } catch (ResourceException e) {
+            e.printStackTrace();
+        }
 
-    private File downloadResource(String key) {
-
-
-
-
-
-        return null;
+        //loadDecks();
     }
 
 

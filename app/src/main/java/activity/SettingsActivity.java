@@ -114,11 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
                 finish();
 
             } catch (Exception e) {
-
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "Connection error - Couldn't reset.",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                UiUtil.showToastMessage(getApplicationContext(), "Connection error - Couldn't reset.");
                 dialog.cancel();
             }
 
@@ -148,11 +144,7 @@ public class SettingsActivity extends AppCompatActivity {
                 finish();
 
             } catch (Exception e) {
-
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "Connection error - Couldn't delete.",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                UiUtil.showToastMessage(getApplicationContext(), "Connection error - Couldn't delete.");
                 dialog.cancel();
             }
 

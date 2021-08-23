@@ -80,5 +80,9 @@ public class Deck implements Comparable<Deck> {
     public Card getNextReview() {
         return cardList.get(0);
     }
+
+    public void fillDeck(Deck deck) {
+
+    }
 }
 

@@ -1,10 +1,8 @@
 package activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.HandlerThread;
 import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,26 +12,18 @@ import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
 import com.example.learndeck.R;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import connection.CardConnection;
 import connection.DeckConnection;
 import exceptions.ConnectionException;
-import exceptions.ResourceException;
-import file.FileSystem;
 import model.Deck;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class DeckActivity extends AppCompatActivity {
 
@@ -77,11 +67,7 @@ public class DeckActivity extends AppCompatActivity {
         //Fetch & load all relevant data for all the decks.
         executor.execute(() -> {
 
-            try {
-                loadDecks();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            loadDecks();
 
         });
     }
@@ -98,22 +84,34 @@ public class DeckActivity extends AppCompatActivity {
     /**
      * Fetches all decks from the webservice and adds them to the GUI.
      */
-    private void loadDecks() throws IOException {
+    private void loadDecks() {
 
         DeckConnection deckDao = new DeckConnection();
 
         //TODO: Fetch from disk first.
         //Fetch all decks.
-        List<Deck> decks = new ArrayList<>(deckDao.getAll());
-
-        for(Deck deck : decks) {
-
-            fillDeck(deck);
-
-            addDeckToGUI(deck);
-            deckMap.put(deck.getCourseId().intValue(), deck);
+        List<Deck> decks = null;
+        try {
+            decks = new ArrayList<>(deckDao.getAll());
+        } catch (ConnectionException e) {
+            UiUtil.showToastMessage(getApplicationContext(), "Couldn't get deck data.");
+            e.printStackTrace();
         }
 
+        boolean deckFillError = false;
+
+        for(Deck deck : decks) {
+            try {
+                fillDeck(deck);
+                addDeckToGUI(deck);
+            } catch (IOException e) {
+                deckFillError = true;
+                e.printStackTrace();
+            }
+        }
+
+        if(deckFillError)
+            UiUtil.showToastMessage(getApplicationContext(), "Some decks couldn't be filled.");
     }
 
     private void fillDeck(Deck deck) throws IOException {
@@ -121,6 +119,8 @@ public class DeckActivity extends AppCompatActivity {
         CardConnection cardDao = new CardConnection();
 
         List<Card> cards = cardDao.getCards(deck.getCourseId().intValue());
+
+        deck.fillDeck(deck);
 
         for(Card card : cards)
             System.out.println(card.toString());
@@ -133,6 +133,7 @@ public class DeckActivity extends AppCompatActivity {
                     deck.getDueCount(),
                     deck.getCourseId().intValue()));
         });
+
     }
 
 

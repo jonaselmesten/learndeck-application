@@ -19,7 +19,16 @@
         <item name="background">@drawable/bkg_side</item>
     </style>
 
-    <style name="DynamicText">
+    <style name="TextPart">
+        <item name="android:gravity">center</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">8sp</item>
+        <item name="autoSizeMaxTextSize">100sp</item>
+        <item name="autoSizeStepGranularity">2sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ImgPart">
 
     </style>
 

@@ -3,11 +3,12 @@ package card;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.example.learndeck.R;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -46,11 +47,11 @@ class ImgTextPart implements CardPart {
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
-            ImageView imageView = new ImageView(context);
+            ImageView imageView = new ImageView(new ContextThemeWrapper(context, R.style.ImgPart));
             Bitmap bitMap = BitmapFactory.decodeFile(img.getAbsolutePath());
             imageView.setImageBitmap(bitMap);
 
-            TextView textView = new TextView(context);
+            TextView textView = new TextView(new ContextThemeWrapper(context, R.style.TextPart));
             textView.setText(text);
 
             layout.addView(imageView);

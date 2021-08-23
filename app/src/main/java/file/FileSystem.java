@@ -1,46 +1,50 @@
 package file;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.storage.options.StorageDownloadFileOptions;
 import exceptions.ResourceException;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 public class FileSystem {
 
-    private static WeakReference<Activity> activityReference;
+    private static String EXT_CACHE_DIR;
+    private static String CACHE_DIR;
+
+    public static void setDirectories(Context context) {
+        EXT_CACHE_DIR = context.getExternalCacheDir().getPath();
+        CACHE_DIR = context.getCacheDir().getPath();
+    }
 
     private FileSystem() {}
-
-    public static void updateActivity(Activity activity) {
-        activityReference = new WeakReference<Activity>(activity);
-    }
 
     /**
      * Retrieves a resource from dir if its already downloaded, or else  it downloads
      * it and then saved it in the folder for later use.
      * @param fileName Key of object to fetch from AWS or cache.
-     * @param dirPath Path where the resource will be saved/searched for.
+     * @param directory Path where the resource will be saved/searched for.
      * @return Path to the file in disk.
      * @throws ResourceException If the resource can't be retrieved.
      */
-    public static File getResource(String fileName, String dirPath) throws ResourceException {
+    public static File getResource(String fileName, Directory directory) throws ResourceException {
 
-        File path = new File(  dirPath + "/" + fileName);
+        File path = new File(  getDirPath(directory) + "/" + fileName);
+        Log.i("Resource", "Getting resource: " + fileName);
+
 
         if(path.exists()) {
-            Log.i("Resource", "Resource already saved in cache: " + fileName);
+            Log.i("Resource", "Found in disk");
             return path;
 
         } else {
+            Log.i("Resource", "Resource not in disk, starting download from cloud...");
             Amplify.Storage.downloadFile(
                     fileName,
                     new File(path.getAbsolutePath()),
                     StorageDownloadFileOptions.defaultInstance(),
-                    result -> Log.i("Resource", "Successfully downloaded to cache: " + result.getFile().getName()),
+                    result -> Log.i("Resource", "Successfully downloaded and saved to cache"),
                     error -> Log.e("Resource",  "Download Failure", error)
             );
         }
@@ -67,6 +71,16 @@ public class FileSystem {
             return path.delete();
         else
             throw new ResourceException("Resouce not found in directory: " + dirPath);
+    }
+
+    private static String getDirPath(Directory directory) {
+        switch (directory) {
+            case EXT_CACHE_DIR:
+                return EXT_CACHE_DIR;
+            case CACHE_DIR:
+                return CACHE_DIR;
+        }
+        return "";
     }
 
 }

@@ -16,6 +16,7 @@ import connection.CardConnection;
 import connection.DeckConnection;
 import deck.Deck;
 import exceptions.ConnectionException;
+import file.FileSystem;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,8 +33,6 @@ public class DeckActivity extends AppCompatActivity {
     private final static Map<Integer, LinearLayout> deckGuiMap = new HashMap<>();
 
     private LinearLayout deckList;
-    private String EXT_CACHE_DIR;
-    private String CACHE_DIR;
     //TODO: Temporary.
     public static final int USER_ID = 1;
 
@@ -52,8 +51,7 @@ public class DeckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
         deckList = findViewById(R.id.deckList);
-        EXT_CACHE_DIR = getApplicationContext().getExternalCacheDir().getPath();
-        CACHE_DIR = getApplicationContext().getCacheDir().getPath();
+        FileSystem.setDirectories(getApplicationContext());
 
         try {
             Amplify.addPlugin(new AWSCognitoAuthPlugin());
@@ -124,9 +122,6 @@ public class DeckActivity extends AppCompatActivity {
 
         for(Card card : cards)
             deck.addCard(card);
-
-        for(Card card : deck.getImmutableList())
-            System.out.println(card.toString());
     }
 
 

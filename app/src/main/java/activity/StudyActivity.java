@@ -20,14 +20,14 @@ public class StudyActivity extends AppCompatActivity {
 
         int courseId = getIntent().getExtras().getInt("courseId");
 
-        deck = loadDeck(courseId);
+        deck = DeckActivity.getDeck(courseId);
         guiSetup(deck.getNextReview());
     }
 
-    private Deck loadDeck(int courseId) {
-        return DeckActivity.getDeck(courseId);
-    }
-
+    /**
+     * Simply sets up the gui for study mode.
+     * @param firstCard Card to load into gui.
+     */
     private void guiSetup(Card firstCard) {
 
         ImageButton showAnswerButton = findViewById(R.id.imageButton);
@@ -65,28 +65,21 @@ public class StudyActivity extends AppCompatActivity {
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
-        answerLayout.addView(question);
-        questionLayout.addView(answer);
+        answerLayout.addView(answer);
+        questionLayout.addView(question);
 
         answerLayout.setVisibility(View.GONE);
     }
 
-    private void showToast(String message) {
-        Toast toast = Toast.makeText(getApplicationContext(),
-                message,
-                Toast.LENGTH_SHORT);
-        toast.show();
-    }
 
     /**
-     * Cleans up the old card.
-     * Then hides the answer part and makes the button row invisible.
+     * Resets the GUI for a new card to review.
+     * The button row is hidden and only the question part is loaded.
      */
-    private void nextCardGui() {
+    private void nextCard() {
 
         ImageButton showAnswerButton = findViewById(R.id.imageButton);
         LinearLayout buttonRow = findViewById(R.id.buttonRow);
-        LinearLayout questionAnswer = findViewById(R.id.questionAnswerLayout);
         showAnswerButton.setVisibility(View.VISIBLE);
         buttonRow.setVisibility(View.INVISIBLE);
 
@@ -95,27 +88,16 @@ public class StudyActivity extends AppCompatActivity {
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
         answerLayout.removeAllViews();
         questionLayout.removeAllViews();
-        answerLayout.setVisibility(View.GONE);
-    }
 
-    /**
-     * Resets the GUI for a new card to review.
-     * The button row is hidden and only the question part is loaded.
-     */
-    private void nextCard() {
-
-        nextCardGui();
-
-        //Load next review.
         Card card = deck.getNextReview();
 
         View question = card.loadQuestionGui(getApplicationContext());
         View answer = card.loadAnswerGui(getApplicationContext());
 
-        LinearLayout answerLayout = findViewById(R.id.answerLayout);
-        LinearLayout questionLayout = findViewById(R.id.questionLayout);
-        answerLayout.addView(answer);
         questionLayout.addView(question);
+        answerLayout.addView(answer);
+
+        answerLayout.setVisibility(View.GONE);
     }
 
     /**
@@ -136,7 +118,7 @@ public class StudyActivity extends AppCompatActivity {
                 break;
         }
 
-        showToast("Next review: xxxx-xx-xx");
+        UiUtil.showToastMessage(getApplicationContext(), "Next review: xxxx-xx-xx");
         nextCard();
     }
 

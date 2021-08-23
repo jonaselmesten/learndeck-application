@@ -5,6 +5,7 @@ import android.view.View;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import exceptions.ResourceException;
 import model.CardResponse;
 
 import java.text.ParseException;
@@ -41,7 +42,7 @@ public class Card {
      * @return Instance of card.
      * @throws IncorrectCardFormatException If something fails due to format error.
      */
-    public static Card fromResponse(CardResponse card) throws IncorrectCardFormatException, ParseException {
+    public static Card fromResponse(CardResponse card) throws IncorrectCardFormatException, ParseException, ResourceException {
 
         Date date = formatter.parse(card.getNextReview());
         ReviewInfo reviewInfo = new ReviewInfo(stringToArray(card.getButtonStats()));
@@ -57,7 +58,7 @@ public class Card {
      * @param component Card component.
      * @return Instance of CardPart.
      */
-    private static CardPart createPart(String json, CardComponent component) throws CardComponentException {
+    private static CardPart createPart(String json, CardComponent component) throws CardComponentException, ResourceException {
 
         switch (component) {
             case TEXT:

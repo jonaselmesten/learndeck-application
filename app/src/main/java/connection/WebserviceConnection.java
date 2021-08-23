@@ -6,6 +6,7 @@ import card.Card;
 import card.IncorrectCardFormatException;
 import deck.Deck;
 import exceptions.ConnectionException;
+import exceptions.ResourceException;
 import model.*;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -85,6 +86,9 @@ class WebserviceConnection {
                 cardList.add(Card.fromResponse(card));
             } catch (IncorrectCardFormatException | ParseException e) {
                 Log.e("WebserviceConnection", "Malformed card couldn't be created: " + card);
+                e.printStackTrace();
+            } catch (ResourceException e) {
+                Log.e("Resource", "Failed to retrieve the resource for this card:" + card);
                 e.printStackTrace();
             }
         }

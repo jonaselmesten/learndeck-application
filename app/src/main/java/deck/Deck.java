@@ -1,7 +1,9 @@
-package model;
+package deck;
 
+import android.util.Log;
 import com.google.gson.annotations.SerializedName;
 import card.Card;
+import model.DeckResponse;
 
 import java.util.*;
 
@@ -12,17 +14,18 @@ public class Deck implements Comparable<Deck> {
 
     private final List<Card> cardList = new ArrayList<>();
 
-    @SerializedName("courseId")
     private final Long courseId;
-    @SerializedName("courseName")
     private String courseName;
-    @SerializedName("dueCount")
     private int dueCount;
 
     public Deck(String courseName, long courseId, int dueCount) {
         this.courseName = courseName;
         this.courseId = courseId;
         this.dueCount = dueCount;
+    }
+
+    public static Deck fromResponse(DeckResponse deck) {
+        return new Deck(deck.getCourseName(), deck.getCourseId(), deck.getDueCount());
     }
 
     public void addCard(Card card) {
@@ -79,10 +82,6 @@ public class Deck implements Comparable<Deck> {
 
     public Card getNextReview() {
         return cardList.get(0);
-    }
-
-    public void fillDeck(Deck deck) {
-
     }
 }
 

@@ -7,19 +7,17 @@ import connection.CardConnection;
 import exceptions.ConnectionException;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 public class CardTest {
 
     @Test
-    public void fetchAllCardFromDeck() throws ConnectionException {
+    public void fetchAllCardFromDeck() throws IOException {
 
-        //CardConnection cardDao = new CardConnection();
-
-        //List<Card> cards = cardDao.getCards(1);
-
-
-
+        CardConnection cardDao = new CardConnection();
+        List<Card> cards = cardDao.getCards(1);
+        
     }
 
 }

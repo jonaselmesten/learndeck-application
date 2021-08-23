@@ -1,15 +1,12 @@
 package activity;
 
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import card.Card;
 import com.example.learndeck.R;
-import model.Deck;
-
-import java.util.Random;
+import deck.Deck;
 
 public class StudyActivity extends AppCompatActivity {
 
@@ -28,10 +25,7 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     private Deck loadDeck(int courseId) {
-
-        Deck deck = DeckActivity.getDeck(courseId);
-
-        return deck;
+        return DeckActivity.getDeck(courseId);
     }
 
     private void guiSetup(Card firstCard) {

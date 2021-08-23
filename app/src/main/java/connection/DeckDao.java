@@ -1,10 +1,9 @@
 package connection;
 
+import deck.Deck;
 import exceptions.ConnectionException;
-import model.Deck;
 
 import java.util.List;
-import java.util.Optional;
 
 interface DeckDao {
 

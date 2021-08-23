@@ -1,8 +1,6 @@
 package service;
 
-import model.CardList;
 import model.DeckList;
-import model.DeckResponse;
 import model.ListResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;

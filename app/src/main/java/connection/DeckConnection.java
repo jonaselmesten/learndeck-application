@@ -1,11 +1,9 @@
 package connection;
 
+import deck.Deck;
 import exceptions.ConnectionException;
-import model.Deck;
 
 import java.util.List;
-
-import static activity.DeckActivity.USER_ID;
 
 public class DeckConnection implements DeckDao {
 
@@ -13,7 +11,7 @@ public class DeckConnection implements DeckDao {
 
     @Override
     public List<Deck> getAll() throws ConnectionException {
-        return connection.getUserDecks(USER_ID);
+        return connection.getUserDecks();
     }
 
     @Override

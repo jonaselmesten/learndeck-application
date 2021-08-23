@@ -14,8 +14,8 @@ import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
 import com.example.learndeck.R;
 import connection.CardConnection;
 import connection.DeckConnection;
+import deck.Deck;
 import exceptions.ConnectionException;
-import model.Deck;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 public class DeckActivity extends AppCompatActivity {
 
     private final static ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final static Map<Integer, Deck> deckMap = new HashMap<>();
+    private final static Map<Integer, Deck> deckMap = new HashMap<Integer, Deck>();
     private final static Map<Integer, LinearLayout> deckGuiMap = new HashMap<>();
 
     private LinearLayout deckList;
@@ -65,11 +65,7 @@ public class DeckActivity extends AppCompatActivity {
         }
 
         //Fetch & load all relevant data for all the decks.
-        executor.execute(() -> {
-
-            loadDecks();
-
-        });
+        executor.execute(this::loadDecks);
     }
 
     /**
@@ -96,6 +92,7 @@ public class DeckActivity extends AppCompatActivity {
         } catch (ConnectionException e) {
             UiUtil.showToastMessage(getApplicationContext(), "Couldn't get deck data.");
             e.printStackTrace();
+            return;
         }
 
         boolean deckFillError = false;
@@ -114,17 +111,24 @@ public class DeckActivity extends AppCompatActivity {
             UiUtil.showToastMessage(getApplicationContext(), "Some decks couldn't be filled.");
     }
 
+    /**
+     * Fetches all the cards from the webservice.
+     * @param deck Deck to fill.
+     * @throws IOException If connection error occurs or if some cards have the wrong format.
+     */
     private void fillDeck(Deck deck) throws IOException {
 
         CardConnection cardDao = new CardConnection();
 
         List<Card> cards = cardDao.getCards(deck.getCourseId().intValue());
 
-        deck.fillDeck(deck);
-
         for(Card card : cards)
+            deck.addCard(card);
+
+        for(Card card : deck.getImmutableList())
             System.out.println(card.toString());
     }
+
 
     private void addDeckToGUI(Deck deck) {
         runOnUiThread(() -> {
@@ -133,7 +137,7 @@ public class DeckActivity extends AppCompatActivity {
                     deck.getDueCount(),
                     deck.getCourseId().intValue()));
         });
-
+        deckMap.put(deck.getCourseId().intValue(), deck);
     }
 
 

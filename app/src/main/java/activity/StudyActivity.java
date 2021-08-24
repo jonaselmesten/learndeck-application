@@ -1,6 +1,7 @@
 package activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,15 @@ public class StudyActivity extends AppCompatActivity {
 
         deck = DeckActivity.getDeck(courseId);
         guiSetup(deck.getNextReview());
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        LinearLayout answerLayout = findViewById(R.id.answerLayout);
+        LinearLayout questionLayout = findViewById(R.id.questionLayout);
+        answerLayout.removeAllViews();
+        questionLayout.removeAllViews();
     }
 
     /**

@@ -69,6 +69,8 @@ class WebserviceConnection {
      */
     List<Card> getDeckCards(int courseId) throws IOException {
 
+        Log.i("Webservice", "Getting cards for deck: " + courseId);
+
         CardService service = retrofit.create(CardService.class);
         Response<ListResponse<CardList>> response = service.getUserReviewCards(courseId, DeckActivity.USER_ID).execute();
 

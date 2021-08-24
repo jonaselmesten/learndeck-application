@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class CardResponse {
 
     @SerializedName("reviewId")
-    private final long courseId;
+    private final long reviewId;
     @SerializedName("nextReview")
     private final String nextReview;
     @SerializedName("dateModifier")
@@ -21,7 +21,7 @@ public class CardResponse {
     @SerializedName("buttonStats")
     private final String buttonStats;
 
-    public CardResponse(long courseId,
+    public CardResponse(long reviewId,
                         String nextReview,
                         int dateModifier,
                         String buttonStats,
@@ -30,7 +30,7 @@ public class CardResponse {
                         String answerType,
                         String answer) {
 
-        this.courseId = courseId;
+        this.reviewId = reviewId;
         this.nextReview = nextReview;
         this.dateModifier = dateModifier;
         this.buttonStats = buttonStats;
@@ -64,8 +64,8 @@ public class CardResponse {
         return dateModifier;
     }
 
-    public long getCourseId() {
-        return courseId;
+    public long getReviewId() {
+        return reviewId;
     }
 
     public String getNextReview() {

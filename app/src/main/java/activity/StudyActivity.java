@@ -1,18 +1,18 @@
 package activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import card.Card;
+import card.Difficulty;
 import com.example.learndeck.R;
 import deck.Deck;
 
 public class StudyActivity extends AppCompatActivity {
 
-    private enum Buttons {HARD, MEDIUM, EASY, VERY_EASY}
-    private Deck deck = null;
+    private Deck deck;
+    private Card currentCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +20,13 @@ public class StudyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_study);
 
         int courseId = getIntent().getExtras().getInt("courseId");
-
         deck = DeckActivity.getDeck(courseId);
-        guiSetup(deck.getNextReview());
+
+        if(deck.noMoreReviews())
+            stopStudy();
+
+        currentCard = deck.getNextReview();
+        guiSetup();
     }
 
     @Override
@@ -34,11 +38,7 @@ public class StudyActivity extends AppCompatActivity {
         questionLayout.removeAllViews();
     }
 
-    /**
-     * Simply sets up the gui for study mode.
-     * @param firstCard Card to load into gui.
-     */
-    private void guiSetup(Card firstCard) {
+    private void guiSetup() {
 
         ImageButton showAnswerButton = findViewById(R.id.imageButton);
         showAnswerButton.setOnClickListener(view -> {
@@ -51,27 +51,27 @@ public class StudyActivity extends AppCompatActivity {
 
         Button hardButton = findViewById(R.id.hardButton);
         hardButton.setOnClickListener(view -> {
-            buttonPushed(Buttons.HARD);
+            buttonPushed(Difficulty.HARD);
         });
 
         Button mediumButton = findViewById(R.id.mediumButton);
         mediumButton.setOnClickListener(view -> {
-            buttonPushed(Buttons.MEDIUM);
+            buttonPushed(Difficulty.MEDIUM);
         });
 
         Button easyButton = findViewById(R.id.easyButton);
         easyButton.setOnClickListener(view -> {
-            buttonPushed(Buttons.EASY);
+            buttonPushed(Difficulty.EASY);
         });
 
         Button veryEasyButton = findViewById(R.id.veryEasyButton);
         veryEasyButton.setOnClickListener(view -> {
-            buttonPushed(Buttons.VERY_EASY);
+            buttonPushed(Difficulty.VERY_EASY);
         });
 
         //Load first review.
-        View question = firstCard.loadQuestionGui(getApplicationContext());
-        View answer = firstCard.loadAnswerGui(getApplicationContext());
+        View question = currentCard.loadQuestionGui(getApplicationContext());
+        View answer = currentCard.loadAnswerGui(getApplicationContext());
 
         LinearLayout answerLayout = findViewById(R.id.answerLayout);
         LinearLayout questionLayout = findViewById(R.id.questionLayout);
@@ -99,6 +99,11 @@ public class StudyActivity extends AppCompatActivity {
         answerLayout.removeAllViews();
         questionLayout.removeAllViews();
 
+        if(deck.noMoreReviews()) {
+            stopStudy();
+            return;
+        }
+
         Card card = deck.getNextReview();
 
         View question = card.loadQuestionGui(getApplicationContext());
@@ -111,24 +116,29 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     /**
+     * Removes the study view and states that there are not more reviews left.
+     */
+    private void stopStudy() {
+        findViewById(R.id.answerLayout).setVisibility(View.GONE);;
+        findViewById(R.id.questionLayout).setVisibility(View.GONE);
+        findViewById(R.id.separator).setVisibility(View.GONE);
+
+        TextView textView = new TextView(getApplicationContext());
+        LinearLayout layout = findViewById(R.id.questionAnswerLayout);
+        textView.setText(R.string.stopStudy);
+        layout.addView(textView);
+    }
+
+
+    /**
      * Handles all logic for updating all the review data for the current card.
      * Will calculate the next review data given the current one.
-     * @param button Button pushed by the user.
+     * @param pushedButton Button pushed by the user.
      */
-    private void buttonPushed(Buttons button) {
+    private void buttonPushed(Difficulty pushedButton) {
 
-        switch (button) {
-            case HARD:
-                break;
-            case MEDIUM:
-                break;
-            case EASY:
-                break;
-            case VERY_EASY:
-                break;
-        }
-
-        UiUtil.showToastMessage(getApplicationContext(), "Next review: xxxx-xx-xx");
+        String nextReview = currentCard.updateReview(pushedButton);
+        UiUtil.showToastMessage(getApplicationContext(), "Next review: " + nextReview);
         nextCard();
     }
 

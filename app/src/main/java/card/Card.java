@@ -10,30 +10,50 @@ import model.CardResponse;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
-/**
- *
- */
-public class Card {
+public class Card implements Comparable<Date> {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-    private final long courseId;
-    private final int dateModifier;
+    private final long reviewId;
+    private int dateModifier;
     private final Date nextReview;
     private final CardPart question;
     private final CardPart answer;
-    private final ReviewInfo buttonStats;
+    private final int[] buttonStats;
 
 
-    private Card(long courseId, Date nextReview, int dateModifier, CardPart question, CardPart answer, ReviewInfo buttonStats) {
-        this.courseId = courseId;
+    private Card(long reviewId, Date nextReview, int dateModifier, CardPart question, CardPart answer, int[] buttonStats) {
+        this.reviewId = reviewId;
         this.nextReview = nextReview;
         this.dateModifier = dateModifier;
         this.question = question;
         this.answer = answer;
         this.buttonStats = buttonStats;
+    }
+
+    public String updateReview(Difficulty pushedButton) {
+
+        Instant date = nextReview.toInstant();
+
+        switch (pushedButton) {
+            case HARD:
+                dateModifier -= -5;
+                break;
+            case MEDIUM:
+                dateModifier -= -1;
+                break;
+            case EASY:
+                dateModifier += 2;
+                break;
+            case VERY_EASY:
+                dateModifier +=4;
+                break;
+        }
+
+        return date.toString();
     }
 
     /**
@@ -45,11 +65,11 @@ public class Card {
     public static Card fromResponse(CardResponse card) throws IncorrectCardFormatException, ParseException, ResourceException {
 
         Date date = formatter.parse(card.getNextReview());
-        ReviewInfo reviewInfo = new ReviewInfo(stringToArray(card.getButtonStats()));
+        int[] buttonStats = stringToArray(card.getButtonStats());
         CardPart question = createPart(card.getQuestion(), CardComponent.from(card.getQuestionType()));
         CardPart answer = createPart(card.getAnswer(), CardComponent.from(card.getAnswerType()));
 
-        return new Card(card.getCourseId(), date, card.getDateModifier(), question, answer, reviewInfo);
+        return new Card(card.getReviewId(), date, card.getDateModifier(), question, answer, buttonStats);
     }
 
     /**
@@ -101,9 +121,14 @@ public class Card {
     }
 
     @Override
+    public int compareTo(Date other) {
+        return this.nextReview.compareTo(other);
+    }
+
+    @Override
     public String toString() {
         return "Card{" +
-                "courseId=" + courseId +
+                "courseId=" + reviewId +
                 ", dateModifier=" + dateModifier +
                 ", nextReview=" + nextReview +
                 ", question=" + question +

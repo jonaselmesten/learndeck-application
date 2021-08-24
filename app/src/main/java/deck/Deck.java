@@ -36,8 +36,6 @@ public class Deck implements Comparable<Deck> {
         cardList.remove(card);
     }
 
-    public void sortCardsAfterId() {}
-
     public void sortCardsAfterReviewDate() {}
 
     public List<Card> getImmutableList() {
@@ -82,6 +80,10 @@ public class Deck implements Comparable<Deck> {
 
     public Card getNextReview() {
         return cardList.get(0);
+    }
+
+    public boolean noMoreReviews() {
+        return cardList.isEmpty();
     }
 }
 

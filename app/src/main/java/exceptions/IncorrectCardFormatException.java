@@ -1,4 +1,4 @@
-package card;
+package exceptions;
 
 public class IncorrectCardFormatException extends Exception {
     public IncorrectCardFormatException(String message) {

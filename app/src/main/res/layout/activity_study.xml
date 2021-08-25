@@ -46,7 +46,7 @@
                 <ImageButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" app:srcCompat="@drawable/logo"
-                        android:id="@+id/imageButton"/>
+                        android:id="@+id/showAnswerButton"/>
             </LinearLayout>
         </ScrollView>
 

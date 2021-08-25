@@ -3,7 +3,7 @@ package connection;
 import activity.DeckActivity;
 import android.util.Log;
 import card.Card;
-import card.IncorrectCardFormatException;
+import exceptions.IncorrectCardFormatException;
 import deck.Deck;
 import exceptions.ConnectionException;
 import exceptions.ResourceException;

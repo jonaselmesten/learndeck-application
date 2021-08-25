@@ -5,21 +5,26 @@ import android.view.View;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import exceptions.CardComponentException;
+import exceptions.IncorrectCardFormatException;
 import exceptions.ResourceException;
 import model.CardResponse;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 
-public class Card implements Comparable<Date> {
+public class Card implements Comparable<Card> {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     private final long reviewId;
     private int dateModifier;
-    private final Date nextReview;
+    private Date nextReview;
     private final CardPart question;
     private final CardPart answer;
     private final int[] buttonStats;
@@ -34,26 +39,61 @@ public class Card implements Comparable<Date> {
         this.buttonStats = buttonStats;
     }
 
-    public String updateReview(Difficulty pushedButton) {
+    /**
+     * Calculates the next review date for this card.
+     * @param pushedButton Difficulty button that was pushed.
+     * @return Review object holding the new review data.
+     */
+    public Review updateReview(Difficulty pushedButton) {
 
         Instant date = nextReview.toInstant();
 
+        if(Instant.now().isAfter(date))
+            date = Instant.now();
+
+        System.out.println("FIRST:" + date);
+
+        System.out.println(date.toString());
+
         switch (pushedButton) {
             case HARD:
-                dateModifier -= -5;
+                dateModifier -= 30;
+                date = Instant.now();
+                buttonStats[0]++;
                 break;
             case MEDIUM:
-                dateModifier -= -1;
+                dateModifier -= 5;
+                date = date.plus(dateModifier, ChronoUnit.DAYS);
+                buttonStats[1]++;
                 break;
             case EASY:
                 dateModifier += 2;
+                date = date.plus(dateModifier, ChronoUnit.DAYS);
+                buttonStats[2]++;
                 break;
             case VERY_EASY:
                 dateModifier +=4;
+                date = date.plus(dateModifier, ChronoUnit.DAYS);
+                buttonStats[3]++;
                 break;
         }
 
-        return date.toString();
+        if(dateModifier < 0)
+            dateModifier = 0;
+
+        if(Instant.now().isAfter(date))
+            date = Instant.now();
+
+        nextReview = Date.from(date);
+
+        System.out.println("AFTERT:" + date.toString().substring(0,10));
+
+        return new Review(reviewId, buttonStats, dateModifier, date.toString().substring(0,10));
+    }
+
+
+    public boolean reviewToday() {
+        return Instant.now().isAfter(nextReview.toInstant());
     }
 
     /**
@@ -121,20 +161,20 @@ public class Card implements Comparable<Date> {
     }
 
     @Override
-    public int compareTo(Date other) {
-        return this.nextReview.compareTo(other);
-    }
-
-    @Override
     public String toString() {
         return "Card{" +
-                "courseId=" + reviewId +
+                "reviewId=" + reviewId +
                 ", dateModifier=" + dateModifier +
                 ", nextReview=" + nextReview +
                 ", question=" + question +
                 ", answer=" + answer +
-                ", buttonStats=" + buttonStats +
+                ", buttonStats=" + Arrays.toString(buttonStats) +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Card card) {
+        return nextReview.compareTo(card.nextReview);
     }
 }
 

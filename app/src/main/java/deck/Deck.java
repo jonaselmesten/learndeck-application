@@ -1,7 +1,5 @@
 package deck;
 
-import android.util.Log;
-import com.google.gson.annotations.SerializedName;
 import card.Card;
 import model.DeckResponse;
 
@@ -12,7 +10,7 @@ import java.util.*;
  */
 public class Deck implements Comparable<Deck> {
 
-    private final List<Card> cardList = new ArrayList<>();
+    private final TreeSet<Card> cardSet = new TreeSet<>();
 
     private final Long courseId;
     private String courseName;
@@ -29,25 +27,15 @@ public class Deck implements Comparable<Deck> {
     }
 
     public void addCard(Card card) {
-        cardList.add(card);
+        cardSet.add(card);
     }
 
     public void removeCard(Card card) {
-        cardList.remove(card);
-    }
-
-    public void sortCardsAfterReviewDate() {}
-
-    public List<Card> getImmutableList() {
-        return Collections.unmodifiableList(cardList);
-    }
-
-    public ListIterator<Card> getCardIterator() {
-        return cardList.listIterator();
+        cardSet.remove(card);
     }
 
     public int getDeckSize() {
-        return cardList.size();
+        return cardSet.size();
     }
 
     @Override
@@ -78,12 +66,8 @@ public class Deck implements Comparable<Deck> {
 
     public int getDueCount() { return dueCount; }
 
-    public Card getNextReview() {
-        return cardList.get(0);
-    }
-
-    public boolean noMoreReviews() {
-        return cardList.isEmpty();
+    public Iterator<Card> getIterator() {
+        return cardSet.iterator();
     }
 }
 

@@ -1,5 +1,7 @@
 package card;
 
+import exceptions.IncorrectCardFormatException;
+
 /**<h1>Card components</h1>
  * This enum contains all the components that a card can consist of.
  */

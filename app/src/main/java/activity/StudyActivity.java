@@ -6,13 +6,20 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import card.Card;
 import card.Difficulty;
+import card.Review;
 import com.example.learndeck.R;
 import deck.Deck;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class StudyActivity extends AppCompatActivity {
 
     private Deck deck;
     private Card currentCard;
+    private Iterator<Card> iterator;
+    private final List<Review> reviewList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +28,14 @@ public class StudyActivity extends AppCompatActivity {
 
         int courseId = getIntent().getExtras().getInt("courseId");
         deck = DeckActivity.getDeck(courseId);
+        iterator = deck.getIterator();
+        currentCard = iterator.next();
 
-        if(deck.noMoreReviews())
+        if(!currentCard.reviewToday()) {
             stopStudy();
+            return;
+        }
 
-        currentCard = deck.getNextReview();
         guiSetup();
     }
 
@@ -40,7 +50,7 @@ public class StudyActivity extends AppCompatActivity {
 
     private void guiSetup() {
 
-        ImageButton showAnswerButton = findViewById(R.id.imageButton);
+        ImageButton showAnswerButton = findViewById(R.id.showAnswerButton);
         showAnswerButton.setOnClickListener(view -> {
             LinearLayout buttonRow = findViewById(R.id.buttonRow);
             buttonRow.setVisibility(View.VISIBLE);
@@ -88,7 +98,7 @@ public class StudyActivity extends AppCompatActivity {
      */
     private void nextCard() {
 
-        ImageButton showAnswerButton = findViewById(R.id.imageButton);
+        ImageButton showAnswerButton = findViewById(R.id.showAnswerButton);
         LinearLayout buttonRow = findViewById(R.id.buttonRow);
         showAnswerButton.setVisibility(View.VISIBLE);
         buttonRow.setVisibility(View.INVISIBLE);
@@ -99,15 +109,15 @@ public class StudyActivity extends AppCompatActivity {
         answerLayout.removeAllViews();
         questionLayout.removeAllViews();
 
-        if(deck.noMoreReviews()) {
+        currentCard = iterator.next();
+
+        if(!currentCard.reviewToday()) {
             stopStudy();
             return;
         }
 
-        Card card = deck.getNextReview();
-
-        View question = card.loadQuestionGui(getApplicationContext());
-        View answer = card.loadAnswerGui(getApplicationContext());
+        View question = currentCard.loadQuestionGui(getApplicationContext());
+        View answer = currentCard.loadAnswerGui(getApplicationContext());
 
         questionLayout.addView(question);
         answerLayout.addView(answer);
@@ -119,9 +129,16 @@ public class StudyActivity extends AppCompatActivity {
      * Removes the study view and states that there are not more reviews left.
      */
     private void stopStudy() {
-        findViewById(R.id.answerLayout).setVisibility(View.GONE);;
-        findViewById(R.id.questionLayout).setVisibility(View.GONE);
+
+        LinearLayout answerLayout = findViewById(R.id.answerLayout);
+        LinearLayout questionLayout = findViewById(R.id.questionLayout);
+        answerLayout.removeAllViews();
+        questionLayout.removeAllViews();
+        answerLayout.setVisibility(View.GONE);
+        questionLayout.setVisibility(View.GONE);
+
         findViewById(R.id.separator).setVisibility(View.GONE);
+        findViewById(R.id.showAnswerButton).setVisibility(View.GONE);
 
         TextView textView = new TextView(getApplicationContext());
         LinearLayout layout = findViewById(R.id.questionAnswerLayout);
@@ -137,8 +154,10 @@ public class StudyActivity extends AppCompatActivity {
      */
     private void buttonPushed(Difficulty pushedButton) {
 
-        String nextReview = currentCard.updateReview(pushedButton);
-        UiUtil.showToastMessage(getApplicationContext(), "Next review: " + nextReview);
+        Review review = currentCard.updateReview(pushedButton);
+        reviewList.add(review);
+
+        UiUtil.showToastMessage(getApplicationContext(), "Next review: " + review.getNextReview());
         nextCard();
     }
 
